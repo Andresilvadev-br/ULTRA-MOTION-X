@@ -1,0 +1,234 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/andresilvadev-br/ultra-motion-x/docs/schema/mdl-1.schema.json",
+  "title": "Ultra Motion X — Motion Design Language umx/1",
+  "description": "Editor assistance schema. The authoritative validation is the compiler (umx validate), which also checks references, cycles and ownership.",
+  "type": "object",
+  "required": ["version"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "version": { "const": "umx/1" },
+    "name": { "type": "string" },
+    "description": { "type": "string" },
+    "profile": {
+      "enum": [
+        "minimal",
+        "professional",
+        "cinematic",
+        "dynamic",
+        "fluid",
+        "sport",
+        "elegant",
+        "ultraResponsive",
+        "singularity"
+      ]
+    },
+    "tokens": {
+      "type": "object",
+      "properties": {
+        "spring": { "type": "object", "additionalProperties": { "$ref": "#/$defs/springParams" } },
+        "duration": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } },
+        "easing": { "type": "object", "additionalProperties": { "$ref": "#/$defs/easing" } }
+      },
+      "additionalProperties": false
+    },
+    "transitions": { "type": "object", "additionalProperties": { "$ref": "#/$defs/transition" } },
+    "components": { "type": "object", "additionalProperties": { "$ref": "#/$defs/component" } },
+    "timelines": { "type": "object", "additionalProperties": { "$ref": "#/$defs/timeline" } },
+    "effects": {
+      "type": "object",
+      "additionalProperties": {
+        "type": "object",
+        "required": ["material"],
+        "properties": {
+          "material": { "enum": ["glass", "ripple", "gradient", "lighting", "noise", "refraction", "shadow"] },
+          "intensity": { "type": "number", "minimum": 0, "maximum": 1 },
+          "blur": { "type": "number", "minimum": 0 },
+          "fallback": { "enum": ["css", "none"] }
+        }
+      }
+    },
+    "performance": {
+      "type": "object",
+      "properties": {
+        "fidelity": {
+          "type": "object",
+          "properties": {
+            "min": { "$ref": "#/$defs/level" },
+            "max": { "$ref": "#/$defs/level" },
+            "initial": { "$ref": "#/$defs/level" }
+          }
+        },
+        "budgetFraction": { "type": "number", "minimum": 0.1, "maximum": 0.9 }
+      }
+    },
+    "accessibility": {
+      "type": "object",
+      "properties": {
+        "reducedMotion": { "enum": ["user", "always", "never"] },
+        "maxIntensity": { "type": "number", "minimum": 0, "maximum": 1 }
+      }
+    }
+  },
+  "additionalProperties": false,
+  "$defs": {
+    "level": { "type": "integer", "minimum": 0, "maximum": 4 },
+    "ref": { "type": "string", "pattern": "^\\$(spring|duration|easing|transitions)\\.[A-Za-z0-9_-]+$" },
+    "springParams": {
+      "type": "object",
+      "properties": {
+        "stiffness": { "type": "number", "exclusiveMinimum": 0 },
+        "damping": { "type": "number", "minimum": 0 },
+        "mass": { "type": "number", "exclusiveMinimum": 0 },
+        "response": { "type": "number", "exclusiveMinimum": 0 },
+        "dampingRatio": { "type": "number", "minimum": 0 },
+        "duration": { "type": "number", "exclusiveMinimum": 0 },
+        "bounce": { "type": "number", "minimum": -1, "maximum": 1 },
+        "restDelta": { "type": "number", "minimum": 0 },
+        "restSpeed": { "type": "number", "minimum": 0 },
+        "clamp": { "type": "boolean" },
+        "maxOscillations": { "type": "integer", "minimum": 0 }
+      }
+    },
+    "easing": {
+      "oneOf": [
+        { "type": "string" },
+        { "type": "array", "items": { "type": "number" }, "minItems": 4, "maxItems": 4 },
+        {
+          "type": "object",
+          "required": ["steps"],
+          "properties": { "steps": { "type": "integer", "minimum": 1 }, "position": { "enum": ["start", "end"] } }
+        },
+        {
+          "type": "object",
+          "required": ["linear"],
+          "properties": { "linear": { "type": "array", "items": { "type": "number" }, "minItems": 2 } }
+        }
+      ]
+    },
+    "transition": {
+      "oneOf": [
+        { "$ref": "#/$defs/ref" },
+        { "const": "instant" },
+        {
+          "type": "object",
+          "properties": {
+            "type": { "enum": ["spring", "tween", "keyframes", "decay", "instant"] },
+            "spring": { "oneOf": [{ "$ref": "#/$defs/ref" }, { "$ref": "#/$defs/springParams" }] },
+            "duration": { "oneOf": [{ "type": "number", "minimum": 0 }, { "$ref": "#/$defs/ref" }] },
+            "delay": { "oneOf": [{ "type": "number", "minimum": 0 }, { "$ref": "#/$defs/ref" }] },
+            "easing": {
+              "oneOf": [{ "$ref": "#/$defs/easing" }, { "type": "array", "items": { "$ref": "#/$defs/easing" } }]
+            },
+            "values": { "type": "array", "items": { "type": ["number", "null"] }, "minItems": 1 },
+            "offsets": { "type": "array", "items": { "type": "number", "minimum": 0, "maximum": 1 } },
+            "timeConstant": { "type": "number", "exclusiveMinimum": 0 }
+          }
+        }
+      ]
+    },
+    "component": {
+      "type": "object",
+      "required": ["properties", "states"],
+      "properties": {
+        "role": { "type": "string" },
+        "priority": { "enum": ["decorative", "ambient", "normal", "interaction", "gesture"] },
+        "properties": {
+          "type": "object",
+          "additionalProperties": {
+            "oneOf": [
+              { "type": "number" },
+              {
+                "type": "object",
+                "properties": {
+                  "initial": { "type": "number" },
+                  "min": { "type": "number" },
+                  "max": { "type": "number" },
+                  "unit": { "type": "string" }
+                },
+                "additionalProperties": false
+              }
+            ]
+          }
+        },
+        "states": {
+          "type": "object",
+          "additionalProperties": { "type": "object", "additionalProperties": { "type": "number" } }
+        },
+        "initial": { "type": "string" },
+        "transition": { "$ref": "#/$defs/transition" },
+        "transitions": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["to"],
+            "properties": {
+              "from": { "type": "string" },
+              "to": { "type": "string" },
+              "on": { "type": "string" },
+              "transition": { "$ref": "#/$defs/transition" },
+              "properties": { "type": "object", "additionalProperties": { "$ref": "#/$defs/transition" } },
+              "delay": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } },
+              "guard": { "type": "string" },
+              "interrupt": { "enum": ["retarget", "queue", "ignore", "snap"] }
+            }
+          }
+        },
+        "relations": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["source", "target", "input", "output"],
+            "properties": {
+              "source": { "type": "string" },
+              "target": { "type": "string" },
+              "input": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+              "output": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+              "clamp": { "type": "boolean" }
+            }
+          }
+        },
+        "gestures": {
+          "type": "object",
+          "properties": {
+            "drag": {
+              "type": "object",
+              "required": ["property"],
+              "properties": {
+                "property": { "type": "string" },
+                "axis": { "enum": ["x", "y"] },
+                "bounds": { "type": "array", "items": { "type": "number" }, "minItems": 2, "maxItems": 2 },
+                "rubberBand": { "type": "number", "minimum": 0, "maximum": 1 },
+                "snapTo": { "type": "array", "items": { "type": ["number", "string"] } },
+                "flingThreshold": { "type": "number", "minimum": 0 }
+              }
+            }
+          },
+          "additionalProperties": false
+        },
+        "effects": { "type": "array", "items": { "type": "string" } }
+      }
+    },
+    "timeline": {
+      "type": "object",
+      "required": ["tracks"],
+      "properties": {
+        "labels": { "type": "object", "additionalProperties": { "type": "number", "minimum": 0 } },
+        "tracks": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "required": ["target", "to"],
+            "properties": {
+              "target": { "type": "string", "pattern": "^[^.]+\\.[^.]+$" },
+              "from": { "type": "number" },
+              "to": { "type": "number" },
+              "at": { "type": ["number", "string"] },
+              "transition": { "$ref": "#/$defs/transition" }
+            }
+          }
+        }
+      }
+    }
+  }
+}

@@ -10,7 +10,9 @@
       "!**/wasm/*.wasm",
       "!**/.umx-tmp",
       "!benchmarks/results",
-      "!tests/fixtures/**/node_modules"
+      "!tests/fixtures/**/node_modules",
+      "!tests/conformance/vectors.json",
+      "!tests/browser/__screenshots__"
     ]
   },
   "formatter": {

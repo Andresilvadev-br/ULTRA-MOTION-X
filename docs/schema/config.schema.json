@@ -1,0 +1,62 @@
+{
+  "$schema": "https://json-schema.org/draft/2020-12/schema",
+  "$id": "https://github.com/andresilvadev-br/ultra-motion-x/docs/schema/config.schema.json",
+  "title": "Ultra Motion X — project integration config (ultra-motion.config.json)",
+  "type": "object",
+  "required": ["profile"],
+  "properties": {
+    "$schema": { "type": "string" },
+    "profile": {
+      "enum": [
+        "minimal",
+        "professional",
+        "cinematic",
+        "dynamic",
+        "fluid",
+        "sport",
+        "elegant",
+        "ultraResponsive",
+        "singularity"
+      ]
+    },
+    "reducedMotion": { "enum": ["user", "always", "never"], "default": "user" },
+    "fidelity": {
+      "type": "object",
+      "properties": {
+        "min": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "max": { "type": "integer", "minimum": 0, "maximum": 4 },
+        "initial": { "type": "integer", "minimum": 0, "maximum": 4 }
+      }
+    },
+    "compositor": { "enum": ["auto", "always", "never"], "default": "auto" },
+    "enhance": {
+      "type": "object",
+      "properties": {
+        "roles": {
+          "type": "array",
+          "items": {
+            "enum": [
+              "button",
+              "card",
+              "menu",
+              "tabs",
+              "modal",
+              "drawer",
+              "notification",
+              "tooltip",
+              "overlay",
+              "list",
+              "navigation",
+              "disclosure",
+              "progress",
+              "page"
+            ]
+          }
+        },
+        "lists": { "type": "boolean" }
+      }
+    },
+    "motion": { "type": "string", "description": "Path to an MDL document with custom components and timelines." }
+  },
+  "additionalProperties": false
+}

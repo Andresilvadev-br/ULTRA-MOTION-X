@@ -7,7 +7,7 @@ permissions:
 jobs:
   web:
     runs-on: ubuntu-latest
-    timeout-minutes: 15
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-node@v4
@@ -15,18 +15,33 @@ jobs:
           node-version: '24'
           cache: npm
       - run: npm ci
+      - name: Generated files are up to date
+        run: |
+          node scripts/gen-tokens.mjs --check
+          node scripts/gen-shaders.mjs --check
+          node scripts/sync-dotnet-bindings.mjs --check
       - run: npm run build
       - run: npm run lint
       - run: npm test
+      - name: Example scripts (integration and update/rollback)
+        run: |
+          node examples/auto-integration/run.mjs
+          node examples/update-rollback/run.mjs
       - run: npx playwright install --with-deps chromium
       - run: npm run test:browser
+      - name: Browser benchmark (quick, informational)
+        run: node benchmarks/web/browser.mjs --quick --out web-bench.json
+      - uses: actions/upload-artifact@v4
+        with:
+          name: web-bench
+          path: web-bench.json
   native:
     strategy:
       fail-fast: false
       matrix:
         os: [ubuntu-latest, windows-latest, macos-latest]
     runs-on: ${{ matrix.os }}
-    timeout-minutes: 20
+    timeout-minutes: 25
     steps:
       - uses: actions/checkout@v4
       - uses: dtolnay/rust-toolchain@master
@@ -38,3 +53,21 @@ jobs:
       - run: cargo clippy --workspace --all-targets --locked -- -D warnings
       - run: cargo test --workspace --locked
       - run: cargo build -p umx-ffi --target wasm32-unknown-unknown --profile wasm --locked
+      - name: C / C++ ABI conformance
+        if: runner.os != 'Windows'
+        shell: bash
+        run: bash sdk/ffi/tests/run.sh
+      - name: Conformance vectors match the Rust reference
+        if: runner.os == 'Linux'
+        shell: bash
+        run: |
+          cargo run -q -p umx-bench --bin conformance > /tmp/vectors.json
+          diff -q /tmp/vectors.json tests/conformance/vectors.json
+      - name: Native benchmark (quick, informational)
+        if: runner.os == 'Linux'
+        run: cargo run --release -q -p umx-bench --bin umx-bench -- --quick > native-bench.json
+      - uses: actions/upload-artifact@v4
+        if: runner.os == 'Linux'
+        with:
+          name: native-bench
+          path: native-bench.json
