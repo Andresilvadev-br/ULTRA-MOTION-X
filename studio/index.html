@@ -5,7 +5,9 @@
   <meta name="viewport" content="width=device-width,initial-scale=1">
   <meta name="theme-color" content="#0a0c12">
   <title>Ultra Motion X — Studio</title>
+  <link rel="icon" href="data:,">
   <link rel="stylesheet" href="/studio/style.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js"}}</script>
 </head>
 <body>
   <div class="shell">
@@ -15,10 +17,20 @@
       <button class="nav active" data-lab="spring">◉ <span>Spring Physics</span></button>
       <button class="nav" data-lab="components">◫ <span>Component Motion</span></button>
       <button class="nav" data-lab="profiles">◇ <span>Motion DNA</span></button>
+      <div class="nav-label">AUTHORING</div>
+      <button class="nav" data-lab="timeline">▤ <span>Timeline</span></button>
+      <button class="nav" data-lab="curve">⌒ <span>Curve Editor</span></button>
+      <button class="nav" data-lab="graph">⬡ <span>Motion Graph · MDL</span></button>
+      <div class="nav-label">INTERACTION</div>
+      <button class="nav" data-lab="gestures">✋ <span>Gestures &amp; Inertia</span></button>
+      <button class="nav" data-lab="effects">✦ <span>Shader Effects</span></button>
+      <div class="nav-label">ANALYSIS</div>
+      <button class="nav" data-lab="compare">⇋ <span>Compare</span></button>
+      <button class="nav" data-lab="diagnostics">◷ <span>Diagnostics · Time Machine</span></button>
       <div class="sidebar-bottom"><span class="online"></span> Powered by UMX SDK <small>Local preview, not a benchmark</small></div>
     </aside>
     <main class="workspace">
-      <header class="top"><div><p class="eyebrow">MOTION LAB / INTERACTIVE</p><h1 id="page-title">Spring Physics</h1><p class="sub" id="page-desc">Feel the dynamics of a real Ultra Motion X spring.</p></div><div class="top-actions"><span class="chip" id="engine-state">Connecting…</span><button class="button secondary" id="reset">Reset</button><button class="button primary" id="replay">▶ Play motion</button></div></header>
+      <header class="top"><div><p class="eyebrow">MOTION LAB / INTERACTIVE</p><h1 id="page-title">Spring Physics</h1><p class="sub" id="page-desc">Feel the dynamics of a real Ultra Motion X spring.</p></div><div class="top-actions"><span class="chip" id="engine-state">Connecting…</span><div class="project-bar" role="toolbar" aria-label="Project"><button class="button secondary" id="undo" title="Undo (Ctrl+Z)" disabled>↶</button><button class="button secondary" id="redo" title="Redo (Ctrl+Shift+Z)" disabled>↷</button><button class="button secondary" id="import">Import</button><button class="button secondary" id="export-project">Export</button></div><button class="button secondary" id="reset">Reset</button><button class="button primary" id="replay">▶ Play motion</button></div></header>
       <section class="layout">
         <div class="content">
           <div class="stage panel">
@@ -43,6 +55,8 @@
           <p class="hint">Reduced-motion settings are respected. Live FPS and GPU measurements require independent instrumentation.</p>
         </aside>
       </section>
+      <section id="lab-host" class="lab-host" hidden aria-live="polite"></section>
+      <p class="history" id="history" aria-live="polite"></p>
     </main>
   </div>
   <div class="fatal" id="fatal" hidden></div>

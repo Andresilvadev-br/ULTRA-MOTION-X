@@ -129,7 +129,63 @@ try {
     spring: ["Spring Physics", "Feel the dynamics of a real Ultra Motion X spring."],
     components: ["Component Motion", "Press, release and interrupt real SDK interactions."],
     profiles: ["Motion DNA", "Choose a shared motion identity and inspect its spring response."],
+    timeline: ["Timeline", "Author keyframed motion, scrub it and step frame by frame."],
+    curve: ["Curve Editor", "Shape cubic-Bézier easing curves and preview them."],
+    graph: ["Motion Graph", "Write Motion Design Language, compile it and drive state machines."],
+    gestures: ["Gestures & Inertia", "Direct manipulation, momentum, rubber banding and snapping."],
+    effects: ["Shader Effects", "GPU materials with fidelity scaling and CSS fallbacks."],
+    compare: ["Compare", "Two configurations side by side and refresh-rate determinism."],
+    diagnostics: ["Diagnostics", "Live telemetry with provenance and the Motion Time Machine."],
   };
+  const builtin = new Set(["spring", "components", "profiles"]);
+  const { Project, download, pickFile } = await import("/studio/project.js");
+  const project = new Project();
+  let wasmCore = null;
+  const wasm = async () => (wasmCore ??= (await import("/sdk/typescript/dist/wasm/index.js")).loadCore());
+  const sdk = await import("/sdk/typescript/dist/index.js");
+  let unmountLab = null;
+  let labToken = 0;
+  async function showLab(name) {
+    unmountLab?.();
+    unmountLab = null;
+    const host = $("lab-host");
+    host.replaceChildren();
+    const custom = !builtin.has(name);
+    document.querySelector(".layout").hidden = custom;
+    host.hidden = !custom;
+    if (!custom) return;
+    const token = ++labToken;
+    const mod = await import(`/studio/labs/${name}.js`);
+    if (token !== labToken) return;
+    unmountLab = (await mod.mount(host, { sdk, engine, project, wasm })) ?? null;
+    animate(host, { opacity: [0, 1], y: [8, 0] }, { engine, spring: "snappy" });
+  }
+  const refreshHistory = (label) => {
+    $("undo").disabled = project.undoStack.length === 0;
+    $("redo").disabled = project.redoStack.length === 0;
+    if (label) $("history").textContent = `Last change: ${label} · saved locally`;
+  };
+  project.on(refreshHistory);
+  refreshHistory();
+  $("undo").addEventListener("click", () => project.undo());
+  $("redo").addEventListener("click", () => project.redo());
+  $("export-project").addEventListener("click", () => download("ultra-motion-studio.json", project.export()));
+  $("import").addEventListener("click", async () => {
+    try {
+      const text = await pickFile();
+      const doc = JSON.parse(text);
+      if (doc.version && String(doc.version).startsWith("umx/")) project.update("import MDL", (p) => (p.mdl = text));
+      else project.replace(doc);
+    } catch (e) {
+      $("history").textContent = `Import failed: ${e.message}`;
+    }
+  });
+  window.addEventListener("keydown", (e) => {
+    if (!(e.ctrlKey || e.metaKey) || e.key.toLowerCase() !== "z" || e.target.closest?.("textarea,input")) return;
+    e.preventDefault();
+    e.shiftKey ? project.redo() : project.undo();
+  });
+  for (const navButton of document.querySelectorAll(".nav")) cleanups.push(press(navButton, { engine }));
   for (const button of document.querySelectorAll("[data-lab]"))
     button.addEventListener("click", () => {
       for (const item of document.querySelectorAll("[data-lab]")) {
@@ -141,7 +197,8 @@ try {
       $("page-desc").textContent = desc;
       document.querySelector(".graph").hidden = button.dataset.lab === "components";
       document.querySelector(".components").hidden = button.dataset.lab === "profiles";
-      graph();
+      showLab(button.dataset.lab).catch((e) => ($("history").textContent = `Lab failed: ${e.message}`));
+      if (builtin.has(button.dataset.lab)) graph();
     });
   $("export").addEventListener("click", async () => {
     const json = JSON.stringify(
