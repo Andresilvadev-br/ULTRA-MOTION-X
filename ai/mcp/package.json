@@ -1,0 +1,31 @@
+{
+  "name": "@ultra-motion-x/mcp",
+  "version": "1.0.0",
+  "description": "Model Context Protocol server exposing Ultra Motion X analysis, integration, diagnostics, rollback and MDL tooling to AI agents (stdio transport).",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "bin": {
+    "ultra-motion-x-mcp": "./bin/mcp.mjs"
+  },
+  "main": "./dist/server.js",
+  "exports": {
+    ".": {
+      "umx-source": "./src/server.ts",
+      "types": "./dist/server.d.ts",
+      "default": "./dist/server.js"
+    }
+  },
+  "files": [
+    "bin",
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@ultra-motion-x/integration": "1.0.0",
+    "@ultra-motion-x/web": "1.0.0"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "node --conditions=umx-source --test test/*.test.ts"
+  }
+}

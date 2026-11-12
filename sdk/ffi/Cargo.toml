@@ -1,0 +1,20 @@
+[package]
+name = "umx-ffi"
+description = "Ultra Motion X C ABI (native platforms: C, C++, C#/.NET, Dart, Unity, Unreal, Godot) and WebAssembly exports."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[lib]
+name = "ultra_motion_x"
+crate-type = ["cdylib", "staticlib", "rlib"]
+
+[dependencies]
+umx-runtime.workspace = true
+umx-core.workspace = true
+umx-physics.workspace = true
+umx-compiler.workspace = true
+serde_json.workspace = true

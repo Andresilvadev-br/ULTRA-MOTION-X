@@ -1,0 +1,32 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "sdk/typescript"
+    },
+    {
+      "path": "rendering/web"
+    },
+    {
+      "path": "devtools"
+    },
+    {
+      "path": "integration"
+    },
+    {
+      "path": "cli"
+    },
+    {
+      "path": "ai/mcp"
+    },
+    {
+      "path": "sdk/framework-adapters/react"
+    },
+    {
+      "path": "sdk/framework-adapters/vue"
+    },
+    {
+      "path": "sdk/framework-adapters/svelte"
+    }
+  ]
+}

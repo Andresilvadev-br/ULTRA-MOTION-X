@@ -1,0 +1,14 @@
+{
+  "name": "ultra-motion-x",
+  "owner": { "name": "Ultra Motion X contributors" },
+  "description": "Ultra Motion X — universal motion engine plugin for Claude Code.",
+  "plugins": [
+    {
+      "name": "ultra-motion-x",
+      "source": "./",
+      "description": "Analyze, integrate, tune, update and roll back the Ultra Motion X engine in your projects.",
+      "category": "development",
+      "tags": ["animation", "motion", "ui"]
+    }
+  ]
+}

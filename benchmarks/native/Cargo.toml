@@ -1,0 +1,17 @@
+[package]
+name = "umx-bench"
+description = "Reproducible native benchmarks for Ultra Motion X."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+publish = false
+
+[dependencies]
+umx-runtime.workspace = true
+umx-physics.workspace = true
+umx-core.workspace = true
+umx-compiler.workspace = true
+umx-render.workspace = true
+umx-telemetry.workspace = true
+serde_json.workspace = true

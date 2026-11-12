@@ -1,0 +1,15 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-plugin-manifest.json",
+  "name": "ultra-motion-x",
+  "displayName": "Ultra Motion X",
+  "version": "1.0.0",
+  "description": "Integrate the Ultra Motion X motion/physics/rendering engine into any compatible project: analysis, planned installation, diagnostics, tuning, updates and rollback.",
+  "author": { "name": "Ultra Motion X contributors" },
+  "repository": "https://github.com/andresilvadev-br/ultra-motion-x",
+  "license": "MIT OR Apache-2.0",
+  "keywords": ["animation", "motion", "physics", "spring", "ui", "integration"],
+  "commands": "./ai/claude-plugin/commands",
+  "skills": "./ai/skills",
+  "agents": ["./ai/claude-plugin/agents/motion-integrator.md"],
+  "mcpServers": "./ai/claude-plugin/mcp.json"
+}

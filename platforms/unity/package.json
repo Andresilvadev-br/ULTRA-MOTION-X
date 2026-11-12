@@ -1,0 +1,15 @@
+{
+  "name": "com.ultramotionx.unity",
+  "version": "1.0.0",
+  "displayName": "Ultra Motion X",
+  "description": "Physics-based UI motion (springs, inertia, motion graphs) for menus, HUDs and UI transitions, powered by the Ultra Motion X native core.",
+  "unity": "2021.3",
+  "license": "MIT OR Apache-2.0",
+  "samples": [
+    {
+      "displayName": "HUD Menu",
+      "description": "Spring-driven menu and HUD panel",
+      "path": "Samples~/HudMenu"
+    }
+  ]
+}

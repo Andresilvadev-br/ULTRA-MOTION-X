@@ -1,0 +1,8 @@
+{
+  "name": "fixture-legacy",
+  "private": true,
+  "dependencies": {
+    "react": "^15.6.0",
+    "react-dom": "^15.6.0"
+  }
+}

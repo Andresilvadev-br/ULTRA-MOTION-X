@@ -1,0 +1,16 @@
+[package]
+name = "umx-scheduler"
+description = "Ultra Motion X Smart Frame Scheduler, Adaptive Refresh estimation, Adaptive Fidelity controller and power policy."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+umx-telemetry.workspace = true
+serde.workspace = true
+
+[lints]
+workspace = true

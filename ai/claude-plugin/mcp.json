@@ -1,0 +1,9 @@
+{
+  "mcpServers": {
+    "ultra-motion-x": {
+      "command": "node",
+      "args": ["${CLAUDE_PLUGIN_ROOT}/ai/claude-plugin/bin/umx-mcp.mjs"],
+      "env": { "ULTRA_MOTION_X_HOME": "${CLAUDE_PLUGIN_ROOT}" }
+    }
+  }
+}

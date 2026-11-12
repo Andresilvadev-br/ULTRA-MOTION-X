@@ -1,0 +1,33 @@
+{
+  "name": "@ultra-motion-x/react",
+  "version": "1.0.0",
+  "description": "React hooks for Ultra Motion X (the core stays framework-agnostic).",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "umx-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "peerDependencies": {
+    "react": ">=16.8.0",
+    "@ultra-motion-x/web": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/react": "19.2.2",
+    "react": "19.2.0",
+    "@ultra-motion-x/web": "1.0.0"
+  },
+  "scripts": {
+    "build": "tsc -b"
+  }
+}

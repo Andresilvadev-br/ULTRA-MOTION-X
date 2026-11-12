@@ -1,0 +1,16 @@
+[package]
+name = "umx-render"
+description = "Ultra Motion X Hyper Render composition layer: layer tree, 2.5D transforms, damage tracking, fidelity-aware effects and resource cache. Platform adapters present the resulting draw list with native APIs."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+umx-scheduler.workspace = true
+serde.workspace = true
+
+[lints]
+workspace = true

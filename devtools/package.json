@@ -1,0 +1,31 @@
+{
+  "name": "@ultra-motion-x/devtools",
+  "version": "1.0.0",
+  "description": "Ultra Motion X DevTools: in-page inspector overlay for animations, motion values, frame timing, fidelity, power and warnings.",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "umx-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "peerDependencies": {
+    "@ultra-motion-x/web": "^1.0.0"
+  },
+  "devDependencies": {
+    "@ultra-motion-x/web": "1.0.0"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "node --conditions=umx-source --test test/*.test.ts"
+  }
+}

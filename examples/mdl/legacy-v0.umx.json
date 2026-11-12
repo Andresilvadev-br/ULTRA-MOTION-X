@@ -1,0 +1,16 @@
+{
+  "version": "umx/0",
+  "profile": "minimal",
+  "components": {
+    "button": {
+      "properties": { "scale": 1 },
+      "variants": { "rest": { "scale": 1 }, "pressed": { "scale": 0.95 } },
+      "initial": "rest",
+      "transition": { "type": "spring", "tension": 400, "friction": 28 },
+      "transitions": [
+        { "to": "pressed", "on": "down", "transition": { "type": "tween", "duration": 0.12, "easing": "easeOut" } },
+        { "to": "rest", "on": "up" }
+      ]
+    }
+  }
+}
