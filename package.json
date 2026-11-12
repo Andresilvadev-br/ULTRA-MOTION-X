@@ -13,7 +13,8 @@
     "rendering/web",
     "devtools",
     "integration",
-    "cli"
+    "cli",
+    "ai/mcp"
   ],
   "scripts": {
     "gen": "node scripts/gen-tokens.mjs && node scripts/build-wasm.mjs",
