@@ -80,6 +80,7 @@ export class Engine {
   private listeners = new Map<EngineEvent, Set<Listener>>();
   private frameStart = 0;
   private powerPolicy: PowerPolicy | null = null;
+  private inFrame = false;
 
   constructor(opts: EngineOptions = {}) {
     this.driver = opts.driver ?? createDefaultDriver();
@@ -152,7 +153,8 @@ export class Engine {
 
   /** Requests a frame if needed. */
   wake(): void {
-    if (this.frameHandle !== null || this.suspended || this.destroyed) return;
+    // Inside a frame, the end-of-frame check decides whether another frame is needed.
+    if (this.inFrame || this.frameHandle !== null || this.suspended || this.destroyed) return;
     this.frameHandle = this.driver.request(this.onFrame);
   }
 
@@ -170,6 +172,24 @@ export class Engine {
   /** Runs one frame at presentation timestamp `ts` (ms). Public for custom drivers. */
   frame(ts: number): void {
     if (this.destroyed) return;
+    this.inFrame = true;
+    try {
+      this.runFrame(ts);
+    } finally {
+      this.inFrame = false;
+    }
+    if (this.tickables.size > 0 || this.scheduler.pending > 0) {
+      this.wake();
+    } else {
+      // Idle: stop the loop entirely; the next interval series starts fresh.
+      this.lastTimestamp = null;
+      this.telemetry.markIdle();
+      this.refresh.breakContinuity();
+      this.emit("idle", ts);
+    }
+  }
+
+  private runFrame(ts: number): void {
     this.frameStart = this.driver.now();
     const fixed = this.options.fixedStep;
     let dtMs = fixed ?? (this.lastTimestamp === null ? 0 : ts - this.lastTimestamp);
@@ -221,15 +241,6 @@ export class Engine {
     this.telemetry.counters.tasksDroppedObsolete = this.scheduler.droppedObsolete;
     this.telemetry.record(ts, work, updateMs, writeMs);
     this.emit("frame", ts);
-    if (this.tickables.size > 0 || this.scheduler.pending > 0) {
-      this.wake();
-    } else {
-      // Idle: stop the loop entirely; the next interval series starts fresh.
-      this.lastTimestamp = null;
-      this.telemetry.markIdle();
-      this.refresh.breakContinuity();
-      this.emit("idle", ts);
-    }
   }
 
   private applyPower(p: PowerPolicy): void {

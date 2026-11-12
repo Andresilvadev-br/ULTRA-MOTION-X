@@ -157,3 +157,14 @@ test("public controls cancel a queued request before it starts", async () => {
   assert.deepEqual(await queued.finished, ["cancelled"]);
   assert.deepEqual(await owner.finished, ["completed"]);
 });
+
+test("no extra frame is requested after the last animation completes", () => {
+  const { driver, engine } = setup();
+  const v = new MotionValue(0, engine);
+  v.on("change", () => engine.write(() => undefined)); // like a DOM renderer flushing styles
+  const a = v.animate(10, spring);
+  let guard = 0;
+  while (a.state !== "completed" && guard++ < 2000) driver.step(1000 / 120);
+  assert.equal(a.state, "completed");
+  assert.equal(driver.hasPendingFrame, false, "the completing frame must leave the loop idle");
+});
