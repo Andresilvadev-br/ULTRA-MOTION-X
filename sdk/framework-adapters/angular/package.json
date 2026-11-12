@@ -1,0 +1,9 @@
+{
+  "name": "@ultra-motion-x/angular",
+  "version": "1.0.0",
+  "description": "Angular standalone directives for Ultra Motion X (source distribution; compile with your Angular toolchain).",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "files": ["src", "README.md"],
+  "peerDependencies": { "@angular/core": ">=15.0.0", "@ultra-motion-x/web": "^1.0.0" }
+}

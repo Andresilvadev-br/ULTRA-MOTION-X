@@ -10,6 +10,9 @@
   },
   "workspaces": [
     "sdk/typescript",
+    "sdk/framework-adapters/react",
+    "sdk/framework-adapters/vue",
+    "sdk/framework-adapters/svelte",
     "rendering/web",
     "devtools",
     "integration",

@@ -143,3 +143,70 @@ export async function exitAndRemove(
   t.destroy();
   el.remove();
 }
+
+/**
+ * Tracks the layout of a container's children across renders (for frameworks that mutate
+ * the DOM themselves, e.g. React/Vue). Call `measure()` after every commit: elements whose
+ * layout position changed since the previous call animate from their old position (FLIP),
+ * keeping any velocity they already had; new elements fade in.
+ */
+export class LayoutTracker {
+  readonly container: Element;
+  readonly engine: Engine;
+  private last = new Map<Element, { x: number; y: number }>();
+  enter: Record<string, number> | false;
+
+  constructor(container: Element, opts: { engine?: Engine; enter?: Record<string, number> | false } = {}) {
+    this.container = container;
+    this.engine = opts.engine ?? getEngine();
+    this.enter = opts.enter ?? { opacity: 0 };
+    this.snapshot();
+  }
+
+  private positions(): Map<Element, { x: number; y: number }> {
+    const base = this.container.getBoundingClientRect();
+    const m = new Map<Element, { x: number; y: number }>();
+    for (const c of Array.from(this.container.children)) {
+      const r = c.getBoundingClientRect();
+      const t = ElementTarget.peek(c);
+      m.set(c, { x: r.left - base.left - (t?.value("x").get() ?? 0), y: r.top - base.top - (t?.value("y").get() ?? 0) });
+    }
+    return m;
+  }
+
+  snapshot(): void {
+    this.last = this.positions();
+  }
+
+  /** Animates changes since the previous measurement; returns the number of moved elements. */
+  measure(): number {
+    const now = this.positions();
+    let moved = 0;
+    const spec = resolveSpec({ spring: "standard" }, this.engine.dna);
+    for (const [el, p] of now) {
+      const was = this.last.get(el);
+      const t = ElementTarget.for(el, this.engine);
+      if (!was) {
+        if (this.enter && !this.engine.reducedMotion) {
+          for (const [prop, v] of Object.entries(this.enter)) {
+            const mv = t.value(prop);
+            mv.set(v);
+            mv.animate(prop === "opacity" || prop.startsWith("scale") ? 1 : 0, spec);
+          }
+        }
+        continue;
+      }
+      const dx = was.x - p.x;
+      const dy = was.y - p.y;
+      if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue;
+      moved++;
+      for (const [prop, d] of [["x", dx], ["y", dy]] as const) {
+        const mv = t.value(prop, "px");
+        mv.jump(mv.get() + d, mv.velocity);
+        mv.animate(0, spec);
+      }
+    }
+    this.last = now;
+    return moved;
+  }
+}

@@ -76,13 +76,13 @@ export {
 } from "./graph/motion-graph.ts";
 // Interaction
 export { type DragController, type DragOptions, drag } from "./interaction/drag.ts";
-export { hover, magnetic, press } from "./interaction/feedback.ts";
+export { type HoverOptions, hover, type MagneticOptions, magnetic, type PressOptions, press } from "./interaction/feedback.ts";
 export { type GestureOptions, gestures } from "./interaction/gestures.ts";
 export { gamepadNavigation, rovingFocus } from "./interaction/navigation.ts";
 export { PointerTracker } from "./interaction/pointer.ts";
 export { predictIntent, predictPosition, projectRelease } from "./interaction/predict.ts";
 // Living interface
-export { exitAndRemove, type LayoutOptions, layoutTransition } from "./living/layout.ts";
+export { exitAndRemove, type LayoutOptions, LayoutTracker, layoutTransition } from "./living/layout.ts";
 export { interpolatePath, morphContainer, morphPath, pathsCompatible } from "./living/morph.ts";
 export { animateShared, captureShared, sharedTransition, viewTransition } from "./living/shared.ts";
 export { depthStack, parallax, tilt } from "./living/spatial.ts";
