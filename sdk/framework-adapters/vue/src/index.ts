@@ -84,7 +84,11 @@ export function useSpring(source: Ref<number>, options: TransitionOptions = {}):
   return out;
 }
 
-export function useAnimate(): (target: Element | string, values: Parameters<typeof animate>[1], opts?: AnimateOptions) => ReturnType<typeof animate> {
+export function useAnimate(): (
+  target: Element | string,
+  values: Parameters<typeof animate>[1],
+  opts?: AnimateOptions,
+) => ReturnType<typeof animate> {
   const running = new Set<ReturnType<typeof animate>>();
   onBeforeUnmount(() => running.forEach((c) => c.cancel()));
   return (target, values, opts) => {

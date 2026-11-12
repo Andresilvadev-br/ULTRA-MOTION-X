@@ -169,7 +169,10 @@ export class LayoutTracker {
     for (const c of Array.from(this.container.children)) {
       const r = c.getBoundingClientRect();
       const t = ElementTarget.peek(c);
-      m.set(c, { x: r.left - base.left - (t?.value("x").get() ?? 0), y: r.top - base.top - (t?.value("y").get() ?? 0) });
+      m.set(c, {
+        x: r.left - base.left - (t?.value("x").get() ?? 0),
+        y: r.top - base.top - (t?.value("y").get() ?? 0),
+      });
     }
     return m;
   }
@@ -200,7 +203,10 @@ export class LayoutTracker {
       const dy = was.y - p.y;
       if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) continue;
       moved++;
-      for (const [prop, d] of [["x", dx], ["y", dy]] as const) {
+      for (const [prop, d] of [
+        ["x", dx],
+        ["y", dy],
+      ] as const) {
         const mv = t.value(prop, "px");
         mv.jump(mv.get() + d, mv.velocity);
         mv.animate(0, spec);

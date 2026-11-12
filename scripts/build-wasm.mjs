@@ -8,7 +8,10 @@ import { dirname, join } from "node:path";
 import { fileURLToPath } from "node:url";
 
 const root = join(dirname(fileURLToPath(import.meta.url)), "..");
-execFileSync("cargo", ["build", "-p", "umx-ffi", "--target", "wasm32-unknown-unknown", "--profile", "wasm"], { cwd: root, stdio: "inherit" });
+execFileSync("cargo", ["build", "-p", "umx-ffi", "--target", "wasm32-unknown-unknown", "--profile", "wasm"], {
+  cwd: root,
+  stdio: "inherit",
+});
 const src = join(root, "target/wasm32-unknown-unknown/wasm/ultra_motion_x.wasm");
 const outDir = join(root, "sdk/typescript/wasm");
 mkdirSync(outDir, { recursive: true });

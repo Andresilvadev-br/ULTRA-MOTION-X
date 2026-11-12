@@ -6,7 +6,16 @@
  *   <div use:drag={{ axis: "x", bounds: "parent" }} />
  *   <ul use:layout={items}>{#each items as i (i.id)}<li>{i.name}</li>{/each}</ul>
  */
-import { type DragOptions, drag as dragImpl, enter as enterImpl, hover as hoverImpl, LayoutTracker, press as pressImpl, type SemanticRole, tilt as tiltImpl } from "@ultra-motion-x/web";
+import {
+  type DragOptions,
+  drag as dragImpl,
+  enter as enterImpl,
+  hover as hoverImpl,
+  LayoutTracker,
+  press as pressImpl,
+  type SemanticRole,
+  tilt as tiltImpl,
+} from "@ultra-motion-x/web";
 
 export interface ActionReturn<P> {
   update?: (p: P) => void;
@@ -24,7 +33,10 @@ export function press(node: HTMLElement, opts: { scale?: number } = {}): ActionR
   };
 }
 
-export function hover(node: HTMLElement, opts: { lift?: number; scale?: number } = {}): ActionReturn<{ lift?: number; scale?: number }> {
+export function hover(
+  node: HTMLElement,
+  opts: { lift?: number; scale?: number } = {},
+): ActionReturn<{ lift?: number; scale?: number }> {
   let off = hoverImpl(node, opts);
   return {
     update(p) {

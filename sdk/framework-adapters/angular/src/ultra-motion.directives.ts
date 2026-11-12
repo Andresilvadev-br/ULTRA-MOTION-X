@@ -9,8 +9,24 @@
  *   <ul umxLayout [umxLayoutTrigger]="items"> … </ul>
  *   <div umxEnter="modal"></div>
  */
-import { type AfterViewChecked, Directive, ElementRef, Input, type OnDestroy, type OnInit, inject } from "@angular/core";
-import { type DragController, type DragOptions, drag, enter, LayoutTracker, press, type SemanticRole } from "@ultra-motion-x/web";
+import {
+  type AfterViewChecked,
+  Directive,
+  ElementRef,
+  Input,
+  inject,
+  type OnDestroy,
+  type OnInit,
+} from "@angular/core";
+import {
+  type DragController,
+  type DragOptions,
+  drag,
+  enter,
+  LayoutTracker,
+  press,
+  type SemanticRole,
+} from "@ultra-motion-x/web";
 
 @Directive({ selector: "[umxPress]", standalone: true })
 export class UmxPressDirective implements OnInit, OnDestroy {
@@ -65,4 +81,9 @@ export class UmxLayoutDirective implements OnInit, AfterViewChecked {
   }
 }
 
-export const ULTRA_MOTION_DIRECTIVES = [UmxPressDirective, UmxDragDirective, UmxEnterDirective, UmxLayoutDirective] as const;
+export const ULTRA_MOTION_DIRECTIVES = [
+  UmxPressDirective,
+  UmxDragDirective,
+  UmxEnterDirective,
+  UmxLayoutDirective,
+] as const;

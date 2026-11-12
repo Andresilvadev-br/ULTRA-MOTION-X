@@ -8,7 +8,9 @@ export default function App() {
       <nav>
         <a href="#a">Home</a>
       </nav>
-      <button onClick={() => setOpen(true)}>Open</button>
+      <button type="button" onClick={() => setOpen(true)}>
+        Open
+      </button>
       <div className="card product-card">Card</div>
       <ul>
         {items.map((i) => (

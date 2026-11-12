@@ -34,13 +34,24 @@
       ],
       "relations": [{ "source": "x", "target": "scrim", "input": [-320, 0], "output": [0, 0.45] }],
       "gestures": {
-        "drag": { "property": "x", "axis": "x", "bounds": [-320, 0], "rubberBand": 0.55, "snapTo": ["closed", "open"], "flingThreshold": 450 }
+        "drag": {
+          "property": "x",
+          "axis": "x",
+          "bounds": [-320, 0],
+          "rubberBand": 0.55,
+          "snapTo": ["closed", "open"],
+          "flingThreshold": 450
+        }
       },
       "effects": ["glass"]
     },
     "toast": {
       "role": "notification",
-      "properties": { "y": { "initial": 24, "unit": "px" }, "opacity": { "initial": 0, "min": 0, "max": 1 }, "scale": { "initial": 0.96 } },
+      "properties": {
+        "y": { "initial": 24, "unit": "px" },
+        "opacity": { "initial": 0, "min": 0, "max": 1 },
+        "scale": { "initial": 0.96 }
+      },
       "states": {
         "hidden": { "y": 24, "opacity": 0, "scale": 0.96 },
         "shown": { "y": 0, "opacity": 1, "scale": 1 }
@@ -48,14 +59,22 @@
       "initial": "hidden",
       "transition": "$transitions.pop",
       "transitions": [
-        { "to": "shown", "on": "show", "properties": { "opacity": { "type": "tween", "duration": 160, "easing": "easeOut" } } },
+        {
+          "to": "shown",
+          "on": "show",
+          "properties": { "opacity": { "type": "tween", "duration": 160, "easing": "easeOut" } }
+        },
         { "to": "hidden", "on": "hide", "transition": "$transitions.fadeFast", "delay": { "scale": 20 } }
       ]
     },
     "card": {
       "role": "card",
       "properties": { "scale": 1, "lift": { "initial": 0, "unit": "px" } },
-      "states": { "rest": { "scale": 1, "lift": 0 }, "hover": { "scale": 1.02, "lift": -4 }, "pressed": { "scale": 0.97, "lift": 0 } },
+      "states": {
+        "rest": { "scale": 1, "lift": 0 },
+        "hover": { "scale": 1.02, "lift": -4 },
+        "pressed": { "scale": 0.97, "lift": 0 }
+      },
       "initial": "rest",
       "transitions": [
         { "to": "hover", "on": "enter" },
@@ -71,7 +90,13 @@
       "tracks": [
         { "target": "toast.opacity", "from": 0, "to": 1, "at": 0, "transition": { "type": "tween", "duration": 200 } },
         { "target": "toast.y", "to": 0, "at": "<", "transition": "$spring.standard" },
-        { "target": "card.scale", "from": 0.9, "to": 1, "at": "content+=50", "transition": { "type": "keyframes", "values": [0.9, 1.04, 1], "duration": 400 } }
+        {
+          "target": "card.scale",
+          "from": 0.9,
+          "to": 1,
+          "at": "content+=50",
+          "transition": { "type": "keyframes", "values": [0.9, 1.04, 1], "duration": 400 }
+        }
       ]
     }
   },

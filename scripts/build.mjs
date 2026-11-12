@@ -8,11 +8,15 @@ import { spawnSync } from "node:child_process";
 import { existsSync } from "node:fs";
 import { resolve } from "node:path";
 import { fileURLToPath } from "node:url";
+
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 function run(label, command, args) {
   process.stdout.write(`[UMX build] ${label}\n`);
   const result = spawnSync(command, args, { cwd: root, stdio: "inherit", shell: false });
-  if (result.error) { console.error(result.error.message); process.exit(1); }
+  if (result.error) {
+    console.error(result.error.message);
+    process.exit(1);
+  }
   if (result.status !== 0) process.exit(result.status ?? 1);
 }
 run("Generating motion tokens", process.execPath, ["scripts/gen-tokens.mjs"]);

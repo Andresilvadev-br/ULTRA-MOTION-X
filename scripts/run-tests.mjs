@@ -10,15 +10,30 @@ import { fileURLToPath } from "node:url";
 
 const root = resolve(fileURLToPath(new URL("..", import.meta.url)));
 const mode = process.argv[2] ?? "unit";
-const unitRoots = ["sdk/typescript/test", "rendering/web/test", "devtools/test", "integration/test", "cli/test", "ai/mcp/test"];
+const unitRoots = [
+  "studio/test",
+  "sdk/typescript/test",
+  "rendering/web/test",
+  "devtools/test",
+  "integration/test",
+  "cli/test",
+  "ai/mcp/test",
+];
 function collect(dir) {
   const path = join(root, dir);
   if (!existsSync(path)) return [];
-  return readdirSync(path).filter(x => /\.test\.[cm]?[jt]s$/.test(x)).map(x => join(path, x)).sort();
+  return readdirSync(path)
+    .filter((x) => /\.test\.[cm]?[jt]s$/.test(x))
+    .map((x) => join(path, x))
+    .sort();
 }
 function run(args, label) {
   console.log(`[UMX tests] ${label}`);
-  const result = spawnSync(process.execPath, args, { cwd: root, stdio: "inherit", env: { ...process.env, NODE_OPTIONS: "" } });
+  const result = spawnSync(process.execPath, args, {
+    cwd: root,
+    stdio: "inherit",
+    env: { ...process.env, NODE_OPTIONS: "" },
+  });
   if (result.error) throw result.error;
   return result.status ?? 1;
 }
@@ -37,7 +52,9 @@ if (mode === "unit" || mode === "integration") {
   const browserFiles = collect("tests/browser");
   if (browserFiles.length) result = nodeTests(browserFiles, "browser");
   else {
-    console.error("[UMX tests] Browser tests not implemented. Configure Playwright and create tests/browser/*.test.mjs.");
+    console.error(
+      "[UMX tests] Browser tests not implemented. Configure Playwright and create tests/browser/*.test.mjs.",
+    );
     result = 1;
   }
 } else if (mode === "all") {

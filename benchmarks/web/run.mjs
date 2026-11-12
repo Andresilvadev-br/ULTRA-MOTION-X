@@ -16,4 +16,17 @@ let checksum = 0;
 const started = performance.now();
 for (let i = 0; i < iterations; i++) checksum += spring.sample((i % 120) / 120).value;
 const ms = performance.now() - started;
-console.log(JSON.stringify({ benchmark: "spring.sample", iterations, ms: Number(ms.toFixed(3)), samplesPerSecond: Math.round(iterations / (ms / 1000)), checksum, note: "Compute-only; does not measure GPU/render FPS" }, null, 2));
+console.log(
+  JSON.stringify(
+    {
+      benchmark: "spring.sample",
+      iterations,
+      ms: Number(ms.toFixed(3)),
+      samplesPerSecond: Math.round(iterations / (ms / 1000)),
+      checksum,
+      note: "Compute-only; does not measure GPU/render FPS",
+    },
+    null,
+    2,
+  ),
+);

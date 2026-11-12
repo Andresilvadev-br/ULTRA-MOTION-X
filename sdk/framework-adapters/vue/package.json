@@ -7,9 +7,26 @@
   "sideEffects": false,
   "main": "./dist/index.js",
   "types": "./dist/index.d.ts",
-  "exports": { ".": { "umx-source": "./src/index.ts", "types": "./dist/index.d.ts", "default": "./dist/index.js" } },
-  "files": ["dist", "src"],
-  "peerDependencies": { "vue": "^3.3.0", "@ultra-motion-x/web": "^1.0.0" },
-  "devDependencies": { "vue": "3.5.45", "@ultra-motion-x/web": "1.0.0" },
-  "scripts": { "build": "tsc -b" }
+  "exports": {
+    ".": {
+      "umx-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "peerDependencies": {
+    "vue": "^3.3.0",
+    "@ultra-motion-x/web": "^1.0.0"
+  },
+  "devDependencies": {
+    "vue": "3.5.45",
+    "@ultra-motion-x/web": "1.0.0"
+  },
+  "scripts": {
+    "build": "tsc -b"
+  }
 }

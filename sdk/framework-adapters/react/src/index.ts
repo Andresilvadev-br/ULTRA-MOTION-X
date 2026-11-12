@@ -12,16 +12,16 @@ import {
   type Engine,
   type GestureOptions,
   type GraphDef,
-  getEngine,
   gestures,
+  getEngine,
   hover,
   LayoutTracker,
   MotionGraph,
   MotionValue,
-  press,
   type PressOptions,
-  type TransitionOptions,
+  press,
   resolveSpec,
+  type TransitionOptions,
 } from "@ultra-motion-x/web";
 import { type RefObject, useCallback, useEffect, useLayoutEffect, useRef, useState, useSyncExternalStore } from "react";
 
@@ -68,7 +68,10 @@ export function useSpring(target: number, options: TransitionOptions = {}): Moti
  * Returns a ref for a scope element and an `animate` bound to it; selectors resolve inside the
  * scope. Running animations are cancelled on unmount.
  */
-export function useAnimate<T extends Element = HTMLElement>(): [RefObject<T | null>, (target: Element | string, values: Parameters<typeof animate>[1], opts?: AnimateOptions) => AnimationControls] {
+export function useAnimate<T extends Element = HTMLElement>(): [
+  RefObject<T | null>,
+  (target: Element | string, values: Parameters<typeof animate>[1], opts?: AnimateOptions) => AnimationControls,
+] {
   const scope = useRef<T | null>(null);
   const running = useRef(new Set<AnimationControls>());
   useEffect(() => {
@@ -88,7 +91,12 @@ export function useAnimate<T extends Element = HTMLElement>(): [RefObject<T | nu
   return [scope, run];
 }
 
-function useAttach<T extends HTMLElement, R>(ref: RefObject<T | null>, attach: (el: T) => R, cleanup: (r: R) => void, deps: unknown[]): void {
+function useAttach<T extends HTMLElement, R>(
+  ref: RefObject<T | null>,
+  attach: (el: T) => R,
+  cleanup: (r: R) => void,
+  deps: unknown[],
+): void {
   useEffect(() => {
     const el = ref.current;
     if (!el) return;
@@ -99,14 +107,30 @@ function useAttach<T extends HTMLElement, R>(ref: RefObject<T | null>, attach: (
 }
 
 export function usePress<T extends HTMLElement>(ref: RefObject<T | null>, opts: PressOpts = {}): void {
-  useAttach(ref, (el) => press(el, opts), (d) => d(), [ref, opts.scale]);
+  useAttach(
+    ref,
+    (el) => press(el, opts),
+    (d) => d(),
+    [ref, opts.scale],
+  );
 }
 
-export function useHover<T extends HTMLElement>(ref: RefObject<T | null>, opts: Parameters<typeof hover>[1] = {}): void {
-  useAttach(ref, (el) => hover(el, opts), (d) => d(), [ref, opts.lift, opts.scale]);
+export function useHover<T extends HTMLElement>(
+  ref: RefObject<T | null>,
+  opts: Parameters<typeof hover>[1] = {},
+): void {
+  useAttach(
+    ref,
+    (el) => hover(el, opts),
+    (d) => d(),
+    [ref, opts.lift, opts.scale],
+  );
 }
 
-export function useDrag<T extends HTMLElement>(ref: RefObject<T | null>, opts: DragOptions = {}): RefObject<DragController | null> {
+export function useDrag<T extends HTMLElement>(
+  ref: RefObject<T | null>,
+  opts: DragOptions = {},
+): RefObject<DragController | null> {
   const ctrl = useRef<DragController | null>(null);
   useAttach(
     ref,
@@ -161,7 +185,11 @@ export function useLayoutTransition<T extends Element>(ref: RefObject<T | null>,
 }
 
 /** A MotionGraph bound to the component; `send` is stable. */
-export function useMotionGraph(def: GraphDef, bindTo?: RefObject<Element | null>, map?: Record<string, string>): { graph: MotionGraph; send: (event: string) => boolean; state: string } {
+export function useMotionGraph(
+  def: GraphDef,
+  bindTo?: RefObject<Element | null>,
+  map?: Record<string, string>,
+): { graph: MotionGraph; send: (event: string) => boolean; state: string } {
   const g = useRef<MotionGraph | null>(null);
   if (!g.current) g.current = new MotionGraph(def);
   const [state, setState] = useState(g.current.state);

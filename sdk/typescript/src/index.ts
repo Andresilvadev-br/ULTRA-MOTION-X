@@ -76,7 +76,14 @@ export {
 } from "./graph/motion-graph.ts";
 // Interaction
 export { type DragController, type DragOptions, drag } from "./interaction/drag.ts";
-export { type HoverOptions, hover, type MagneticOptions, magnetic, type PressOptions, press } from "./interaction/feedback.ts";
+export {
+  type HoverOptions,
+  hover,
+  type MagneticOptions,
+  magnetic,
+  type PressOptions,
+  press,
+} from "./interaction/feedback.ts";
 export { type GestureOptions, gestures } from "./interaction/gestures.ts";
 export { gamepadNavigation, rovingFocus } from "./interaction/navigation.ts";
 export { PointerTracker } from "./interaction/pointer.ts";

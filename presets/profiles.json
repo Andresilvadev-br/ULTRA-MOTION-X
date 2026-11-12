@@ -14,8 +14,15 @@
         "bouncy": { "response": 0.32, "dampingRatio": 1.0 }
       },
       "easing": { "standard": [0.2, 0, 0, 1], "enter": [0, 0, 0.2, 1], "exit": [0.4, 0, 1, 1] },
-      "pressScale": 0.98, "hoverLift": 0, "depth": 0, "stagger": 0, "parallax": 0,
-      "intensity": 0.4, "elasticity": 0.35, "flingTimeConstant": 0.3, "distanceScale": 0.0
+      "pressScale": 0.98,
+      "hoverLift": 0,
+      "depth": 0,
+      "stagger": 0,
+      "parallax": 0,
+      "intensity": 0.4,
+      "elasticity": 0.35,
+      "flingTimeConstant": 0.3,
+      "distanceScale": 0.0
     },
     "professional": {
       "label": "Professional",
@@ -28,8 +35,15 @@
         "bouncy": { "response": 0.4, "dampingRatio": 0.8 }
       },
       "easing": { "standard": [0.2, 0, 0, 1], "enter": [0.05, 0.7, 0.1, 1], "exit": [0.3, 0, 0.8, 0.15] },
-      "pressScale": 0.97, "hoverLift": 2, "depth": 8, "stagger": 30, "parallax": 0.2,
-      "intensity": 0.6, "elasticity": 0.5, "flingTimeConstant": 0.325, "distanceScale": 0.15
+      "pressScale": 0.97,
+      "hoverLift": 2,
+      "depth": 8,
+      "stagger": 30,
+      "parallax": 0.2,
+      "intensity": 0.6,
+      "elasticity": 0.5,
+      "flingTimeConstant": 0.325,
+      "distanceScale": 0.15
     },
     "cinematic": {
       "label": "Cinematic",
@@ -42,8 +56,15 @@
         "bouncy": { "response": 0.6, "dampingRatio": 0.7 }
       },
       "easing": { "standard": [0.65, 0, 0.35, 1], "enter": [0.16, 1, 0.3, 1], "exit": [0.7, 0, 0.84, 0] },
-      "pressScale": 0.97, "hoverLift": 4, "depth": 24, "stagger": 60, "parallax": 0.6,
-      "intensity": 0.9, "elasticity": 0.55, "flingTimeConstant": 0.4, "distanceScale": 0.3
+      "pressScale": 0.97,
+      "hoverLift": 4,
+      "depth": 24,
+      "stagger": 60,
+      "parallax": 0.6,
+      "intensity": 0.9,
+      "elasticity": 0.55,
+      "flingTimeConstant": 0.4,
+      "distanceScale": 0.3
     },
     "dynamic": {
       "label": "Dynamic",
@@ -56,8 +77,15 @@
         "bouncy": { "response": 0.4, "dampingRatio": 0.55 }
       },
       "easing": { "standard": [0.34, 1.2, 0.64, 1], "enter": [0.22, 1, 0.36, 1], "exit": [0.55, 0, 1, 0.45] },
-      "pressScale": 0.94, "hoverLift": 4, "depth": 16, "stagger": 40, "parallax": 0.5,
-      "intensity": 1.0, "elasticity": 0.6, "flingTimeConstant": 0.35, "distanceScale": 0.25
+      "pressScale": 0.94,
+      "hoverLift": 4,
+      "depth": 16,
+      "stagger": 40,
+      "parallax": 0.5,
+      "intensity": 1.0,
+      "elasticity": 0.6,
+      "flingTimeConstant": 0.35,
+      "distanceScale": 0.25
     },
     "fluid": {
       "label": "Fluid",
@@ -70,8 +98,15 @@
         "bouncy": { "response": 0.5, "dampingRatio": 0.7 }
       },
       "easing": { "standard": [0.45, 0, 0.15, 1], "enter": [0.12, 0.8, 0.2, 1], "exit": [0.5, 0, 0.75, 0] },
-      "pressScale": 0.97, "hoverLift": 3, "depth": 16, "stagger": 45, "parallax": 0.4,
-      "intensity": 0.8, "elasticity": 0.55, "flingTimeConstant": 0.38, "distanceScale": 0.25
+      "pressScale": 0.97,
+      "hoverLift": 3,
+      "depth": 16,
+      "stagger": 45,
+      "parallax": 0.4,
+      "intensity": 0.8,
+      "elasticity": 0.55,
+      "flingTimeConstant": 0.38,
+      "distanceScale": 0.25
     },
     "sport": {
       "label": "Sport",
@@ -84,8 +119,15 @@
         "bouncy": { "response": 0.28, "dampingRatio": 0.6 }
       },
       "easing": { "standard": [0.3, 0, 0, 1], "enter": [0, 0.6, 0.2, 1], "exit": [0.5, 0, 1, 1] },
-      "pressScale": 0.93, "hoverLift": 3, "depth": 12, "stagger": 25, "parallax": 0.3,
-      "intensity": 1.0, "elasticity": 0.6, "flingTimeConstant": 0.3, "distanceScale": 0.2
+      "pressScale": 0.93,
+      "hoverLift": 3,
+      "depth": 12,
+      "stagger": 25,
+      "parallax": 0.3,
+      "intensity": 1.0,
+      "elasticity": 0.6,
+      "flingTimeConstant": 0.3,
+      "distanceScale": 0.2
     },
     "elegant": {
       "label": "Elegant",
@@ -98,8 +140,15 @@
         "bouncy": { "response": 0.55, "dampingRatio": 0.88 }
       },
       "easing": { "standard": [0.4, 0, 0.2, 1], "enter": [0.25, 0.1, 0.25, 1], "exit": [0.42, 0, 1, 1] },
-      "pressScale": 0.985, "hoverLift": 2, "depth": 12, "stagger": 50, "parallax": 0.25,
-      "intensity": 0.5, "elasticity": 0.45, "flingTimeConstant": 0.38, "distanceScale": 0.2
+      "pressScale": 0.985,
+      "hoverLift": 2,
+      "depth": 12,
+      "stagger": 50,
+      "parallax": 0.25,
+      "intensity": 0.5,
+      "elasticity": 0.45,
+      "flingTimeConstant": 0.38,
+      "distanceScale": 0.2
     },
     "ultraResponsive": {
       "label": "Ultra Responsive",
@@ -112,8 +161,15 @@
         "bouncy": { "response": 0.24, "dampingRatio": 0.75 }
       },
       "easing": { "standard": [0.2, 0, 0, 1], "enter": [0, 0, 0.1, 1], "exit": [0.4, 0, 1, 1] },
-      "pressScale": 0.96, "hoverLift": 2, "depth": 8, "stagger": 15, "parallax": 0.2,
-      "intensity": 0.7, "elasticity": 0.5, "flingTimeConstant": 0.28, "distanceScale": 0.1
+      "pressScale": 0.96,
+      "hoverLift": 2,
+      "depth": 8,
+      "stagger": 15,
+      "parallax": 0.2,
+      "intensity": 0.7,
+      "elasticity": 0.5,
+      "flingTimeConstant": 0.28,
+      "distanceScale": 0.1
     },
     "singularity": {
       "label": "Singularity",
@@ -126,8 +182,15 @@
         "bouncy": { "response": 0.42, "dampingRatio": 0.5 }
       },
       "easing": { "standard": [0.5, 0, 0.1, 1], "enter": [0.1, 0.9, 0.2, 1], "exit": [0.6, 0, 0.9, 0.3] },
-      "pressScale": 0.92, "hoverLift": 6, "depth": 40, "stagger": 35, "parallax": 1.0,
-      "intensity": 1.0, "elasticity": 0.65, "flingTimeConstant": 0.42, "distanceScale": 0.35
+      "pressScale": 0.92,
+      "hoverLift": 6,
+      "depth": 40,
+      "stagger": 35,
+      "parallax": 1.0,
+      "intensity": 1.0,
+      "elasticity": 0.65,
+      "flingTimeConstant": 0.42,
+      "distanceScale": 0.35
     }
   },
   "reducedMotion": {
