@@ -19,20 +19,54 @@ fn main() {
     ] {
         let p = SpringParams::new(k, c, m).unwrap();
         let s = Spring::new(p, from, to, v0).unwrap();
-        let samples: Vec<_> = times.iter().map(|&t| { let st = s.sample(t); serde_json::json!([t, st.position, st.velocity, st.done]) }).collect();
+        let samples: Vec<_> = times
+            .iter()
+            .map(|&t| {
+                let st = s.sample(t);
+                serde_json::json!([t, st.position, st.velocity, st.done])
+            })
+            .collect();
         springs.push(serde_json::json!({"stiffness": k, "damping": c, "mass": m, "from": from, "to": to, "v0": v0, "finishTime": s.finish_time(), "samples": samples}));
     }
     let mut easings = Vec::new();
-    for name in ["ease", "easeIn", "easeOut", "easeInOut", "standard", "backOut", "emphasized"] {
+    for name in [
+        "ease",
+        "easeIn",
+        "easeOut",
+        "easeInOut",
+        "standard",
+        "backOut",
+        "emphasized",
+    ] {
         let e = Easing::named(name).unwrap();
-        let samples: Vec<_> = (0..=20).map(|i| { let p = i as f64 / 20.0; serde_json::json!([p, e.apply(p), e.derivative(p)]) }).collect();
+        let samples: Vec<_> = (0..=20)
+            .map(|i| {
+                let p = i as f64 / 20.0;
+                serde_json::json!([p, e.apply(p), e.derivative(p)])
+            })
+            .collect();
         easings.push(serde_json::json!({"name": name, "samples": samples}));
     }
     let d = Decay::new(DecayParams::default(), 10.0, 1200.0).unwrap();
-    let decay: Vec<_> = times.iter().map(|&t| { let (s, done) = d.sample(t); serde_json::json!([t, s.position, s.velocity, done]) }).collect();
-    let ip = InertiaParams { max: Some(200.0), ..InertiaParams::default() };
+    let decay: Vec<_> = times
+        .iter()
+        .map(|&t| {
+            let (s, done) = d.sample(t);
+            serde_json::json!([t, s.position, s.velocity, done])
+        })
+        .collect();
+    let ip = InertiaParams {
+        max: Some(200.0),
+        ..InertiaParams::default()
+    };
     let inertia = Inertia::new(&ip, 0.0, 2500.0).unwrap();
-    let inertia_samples: Vec<_> = times.iter().map(|&t| { let (s, done) = inertia.sample(t); serde_json::json!([t, s.position, s.velocity, done]) }).collect();
+    let inertia_samples: Vec<_> = times
+        .iter()
+        .map(|&t| {
+            let (s, done) = inertia.sample(t);
+            serde_json::json!([t, s.position, s.velocity, done])
+        })
+        .collect();
     let out = serde_json::json!({
         "generator": "umx-bench/conformance",
         "version": env!("CARGO_PKG_VERSION"),

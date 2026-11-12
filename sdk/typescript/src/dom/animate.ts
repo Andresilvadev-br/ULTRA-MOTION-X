@@ -166,7 +166,10 @@ class Controls implements AnimationControls {
   }
   cancel(): void {
     this.restarts = [];
-    for (const a of this.live()) a.cancel();
+    // Pending queued requests are owned by these controls too.
+    for (const a of this.animations) {
+      if (a.state === "pending" || a.state === "running" || a.state === "paused") a.cancel();
+    }
   }
   stop(): void {
     this.cancel();

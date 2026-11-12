@@ -310,10 +310,12 @@ export class MotionValue implements Tickable {
 
   /** Stops all animation at the current value. */
   stop(): void {
-    if (this.owner) this.cancelAnimation(this.owner, "cancelled");
-    for (const l of [...this.layers]) this.cancelAnimation(l, "cancelled");
+    // Clear pending work first: cancelling the owner normally promotes the queue.
+    // stop()/destroy() must never start a successor or leave its promise unresolved.
     for (const q of this.queue) q.settle("cancelled");
     this.queue = [];
+    if (this.owner) this.cancelAnimation(this.owner, "cancelled");
+    for (const l of [...this.layers]) this.cancelAnimation(l, "cancelled");
     this.vel = 0;
   }
 

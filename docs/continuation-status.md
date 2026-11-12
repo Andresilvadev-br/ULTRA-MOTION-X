@@ -16,17 +16,23 @@ Claude's implementation was preserved; the continuation builds on it.
 - Aligned the Node requirement with the source-based test runner.
 - Fixed existing formatter/import diagnostics and the fixture button type.
 - Added Web and native cross-platform CI and setup documentation.
+- Fixed queued-animation cancellation: stop/destroy no longer promote queued work,
+  and public controls cancel pending requests. Added three regression tests.
+- Fixed the three native rustfmt failures and regenerated WASM/conformance data.
 
 ## Validation in the development environment
 
 - `npm ci`: passed.
 - `npm run build`: passed.
-- `npm test`: 39 passed, none failed or skipped (includes WASM/conformance and server tests).
-- Browser suite: attempted; Chromium could not start because the environment
-  rejects its socket operation (`Operation not permitted`). Browser behavior is
-  not certified by the unit tests. Run the committed Playwright suite in CI or locally.
-- Native build, rustfmt, clippy, Rust tests: not run; `cargo` is not installed in
-  this development environment. The CI matrix is provided to run these checks.
+- `npm run lint`: passed.
+- `npm test`: 42 passed, none failed or skipped (includes WASM/conformance and server tests).
+- Browser suite: both Playwright tests passed in GitHub Actions on the Studio
+  implementation; local Chromium startup remains blocked by socket permissions.
+- Installed the pinned Rust toolchain after the initial environment check.
+  `cargo fmt --all --check`, clippy with `-D warnings`, and workspace tests passed locally.
+- Rebuilt WASM, regenerated the Rust conformance vectors, and passed all 13
+  conformance/module tests against the regenerated artifacts.
+- Native Windows/macOS/Linux CI is rerun after fixing the initial formatting failures.
 
 ## Remaining scope / limits
 

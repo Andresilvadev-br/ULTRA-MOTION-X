@@ -1073,7 +1073,18 @@ mod tests {
             let p = umx_particles_new(256, 1);
             assert!(
                 umx_particles_add_emitter(
-                    p, 0.0, 0.0, 0.0, 0.0, std::f64::consts::TAU, 10.0, 20.0, 0.2, 0.3, 1.0, 2.0
+                    p,
+                    0.0,
+                    0.0,
+                    0.0,
+                    0.0,
+                    std::f64::consts::TAU,
+                    10.0,
+                    20.0,
+                    0.2,
+                    0.3,
+                    1.0,
+                    2.0
                 ) >= 0
             );
             assert_eq!(umx_particles_burst(p, 0, 50), 50);

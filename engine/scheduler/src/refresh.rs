@@ -39,7 +39,6 @@ impl RefreshEstimator {
     /// Feeds a presentation timestamp in milliseconds. Returns `true` if the estimate changed
     /// (e.g. window moved to another monitor).
     pub fn sample(&mut self, timestamp_ms: f64) -> bool {
-        
         if let Some(last) = self.last {
             let dt = timestamp_ms - last;
             if dt > 0.5 && dt < 100.0 {

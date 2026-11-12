@@ -3,6 +3,7 @@ import { test } from "node:test";
 import { ManualDriver } from "../src/core/driver.ts";
 import { createEngine } from "../src/core/engine.ts";
 import { MotionValue } from "../src/core/motion-value.ts";
+import { animate } from "../src/dom/animate.ts";
 import { namedEasing } from "../src/math/easing.ts";
 import { springParams } from "../src/math/spring.ts";
 
@@ -112,4 +113,47 @@ test("destroy releases the value", () => {
   }
   assert.equal(engine.valueCount, before);
   assert.equal(engine.activeCount, 0);
+});
+
+test("stop cancels queued animations without promoting a new owner", async () => {
+  const { driver, engine } = setup();
+  const value = new MotionValue(0, engine);
+  const first = value.animate(100, spring);
+  const queued = value.animate(200, spring, { policy: "queue" });
+  const last = value.animate(300, spring, { policy: "queue" });
+  driver.step(16);
+  const stoppedAt = value.get();
+  value.stop();
+  driver.run(16);
+  assert.equal(value.get(), stoppedAt);
+  assert.equal(value.currentAnimation, null);
+  assert.deepEqual(await Promise.all([first.finished, queued.finished, last.finished]), [
+    "cancelled",
+    "cancelled",
+    "cancelled",
+  ]);
+});
+
+test("destroy settles queued animation promises", async () => {
+  const { engine } = setup();
+  const value = new MotionValue(0, engine);
+  const first = value.animate(100, spring);
+  const queued = value.animate(200, spring, { policy: "queue" });
+  value.destroy();
+  assert.equal(queued.state, "cancelled");
+  assert.deepEqual(await Promise.all([first.finished, queued.finished]), ["cancelled", "cancelled"]);
+  assert.equal(engine.activeCount, 0);
+});
+
+test("public controls cancel a queued request before it starts", async () => {
+  const { driver, engine } = setup();
+  const value = new MotionValue(0, engine);
+  const owner = animate(value, 100, { engine, spring: spring.spring });
+  const queued = animate(value, 200, { engine, spring: spring.spring, policy: "queue" });
+  queued.cancel();
+  assert.equal(queued.animations[0]!.state, "cancelled");
+  driver.run(16);
+  assert.equal(value.get(), 100);
+  assert.deepEqual(await queued.finished, ["cancelled"]);
+  assert.deepEqual(await owner.finished, ["completed"]);
 });
