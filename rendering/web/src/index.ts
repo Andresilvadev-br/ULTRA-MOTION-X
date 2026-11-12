@@ -303,7 +303,10 @@ export class Surface implements Tickable {
       this.releaseGl();
       this.initCss();
     }
-    if (this.backend === "css") return this.renderCss();
+    if (this.backend === "css") {
+      this.renderCss();
+      return;
+    }
     const gl = this.gl;
     const c = this.canvas;
     if (!gl || !c || !this.program) return;
