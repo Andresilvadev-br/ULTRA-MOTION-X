@@ -1,0 +1,119 @@
+:root {
+  color-scheme: dark;
+  --bg: #090b10;
+  --panel: #11141d;
+  --line: #252936;
+  --text: #f3f3f8;
+  --muted: #8b93a7;
+  --accent: #ff8748;
+  --blue: #6f8cff;
+  font:
+    14px / 1.5 Inter,
+    ui-sans-serif,
+    system-ui,
+    sans-serif;
+  background: var(--bg);
+  color: var(--text);
+}
+* {
+  box-sizing: border-box;
+}
+body {
+  margin: 0;
+  min-height: 100vh;
+}
+a {
+  color: var(--blue);
+}
+header.ex {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 16px 24px;
+  border-bottom: 1px solid var(--line);
+}
+header.ex h1 {
+  font-size: 18px;
+  margin: 0;
+}
+header.ex p {
+  margin: 2px 0 0;
+  color: var(--muted);
+  font-size: 13px;
+}
+main.ex {
+  padding: 24px;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+.btn {
+  font: inherit;
+  color: var(--text);
+  background: #1d2236;
+  border: 1px solid #2f3654;
+  border-radius: 10px;
+  padding: 8px 14px;
+  cursor: pointer;
+}
+.btn.primary {
+  background: var(--accent);
+  border-color: var(--accent);
+  color: #140b05;
+  font-weight: 600;
+}
+.btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
+.panel {
+  background: var(--panel);
+  border: 1px solid var(--line);
+  border-radius: 16px;
+  padding: 16px;
+}
+.grid {
+  display: grid;
+  gap: 16px;
+  grid-template-columns: repeat(auto-fill, minmax(220px, 1fr));
+}
+.muted {
+  color: var(--muted);
+}
+.row {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+  align-items: center;
+}
+.chip {
+  display: inline-block;
+  padding: 2px 10px;
+  border-radius: 999px;
+  border: 1px solid var(--line);
+  color: var(--muted);
+  font-size: 12px;
+}
+.back {
+  color: var(--muted);
+  text-decoration: none;
+  font-size: 13px;
+}
+pre.out {
+  background: #0b0d14;
+  border-radius: 10px;
+  padding: 12px;
+  font:
+    12px / 1.5 ui-monospace,
+    monospace;
+  white-space: pre-wrap;
+  color: #c6cbe0;
+}
+@media (max-width: 700px) {
+  main.ex {
+    padding: 14px;
+  }
+  header.ex {
+    padding: 12px 14px;
+  }
+}

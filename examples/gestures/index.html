@@ -1,0 +1,35 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Gestures & inertia — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.viewport{overflow:hidden;border-radius:16px;border:1px solid var(--line)}.strip{display:flex;gap:16px;padding:16px;width:max-content;touch-action:pan-y;cursor:grab}.slide{width:260px;height:180px;border-radius:16px;background:linear-gradient(135deg,#6f8cff,#a78bfa);display:grid;place-items:center;font-size:32px;font-weight:700;color:#111;user-select:none}
+.zoom{margin-top:24px;height:260px;border-radius:16px;border:1px solid var(--line);overflow:hidden;display:grid;place-items:center;touch-action:none}.zoom div{width:200px;height:200px;border-radius:24px;background:conic-gradient(#ff8748,#6f8cff,#5ee0a0,#ff8748)}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Gestures & inertia</h1><p>Fling the carousel: release velocity projects to the nearest card (snap). Pinch or ctrl+wheel the image to zoom.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="viewport" id="vp"><div class="strip" id="strip"></div></div>
+    <div class="zoom" id="zoom"><div id="img"></div></div>
+  </main>
+  <script type="module">
+    import { drag, gestures, animate } from "@ultra-motion-x/web";
+    const strip = document.getElementById("strip");
+    for (let i = 1; i <= 8; i++) strip.insertAdjacentHTML("beforeend", `<div class="slide" style="filter:hue-rotate(${i * 35}deg)">${i}</div>`);
+    const step = 276;
+    const min = -(8 * step - document.getElementById("vp").clientWidth + 16);
+    drag(strip, { axis: "x", bounds: { left: Math.min(0, min), right: 0 }, snapX: Array.from({ length: 8 }, (_, i) => Math.max(min, -i * step)), onEnd: (i) => (document.getElementById("status").textContent = `${i.intent} · ${Math.round(i.vx)} px/s`) });
+    let scale = 1, base = 1;
+    const img = document.getElementById("img");
+    gestures(document.getElementById("zoom"), {
+      onPinch: (e) => { scale = Math.min(3, Math.max(0.5, base * e.scale)); animate(img, { scale, rotate: e.rotation }, { type: "instant" }); },
+      onPinchEnd: () => { base = scale; animate(img, { rotate: 0 }, { spring: "bouncy" }); },
+      onWheel: (e) => { if (!e.zoom) return; scale = base = Math.min(3, Math.max(0.5, scale * (1 - e.dy / 300))); animate(img, { scale }, { spring: "snappy" }); },
+      onDoubleTap: () => { scale = base = 1; animate(img, { scale: 1, rotate: 0 }, { spring: "bouncy" }); },
+    });
+  </script>
+</body>
+</html>

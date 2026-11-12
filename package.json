@@ -17,7 +17,9 @@
     "devtools",
     "integration",
     "cli",
-    "ai/mcp"
+    "ai/mcp",
+    "platforms/desktop/electron",
+    "platforms/mobile/react-native"
   ],
   "scripts": {
     "gen": "node scripts/gen-tokens.mjs && node scripts/build-wasm.mjs",

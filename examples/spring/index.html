@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Spring physics — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.field{position:relative;height:60vh;border:1px dashed var(--line);border-radius:16px;overflow:hidden;cursor:crosshair}.ball{position:absolute;left:0;top:0;width:44px;height:44px;margin:-22px;border-radius:50%;display:grid;place-items:center;font-size:10px;color:#111;font-weight:700}
+.legend span{margin-right:12px}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Spring physics</h1><p>Click anywhere: every ball retargets to the pointer keeping its velocity. Each uses a different Motion DNA profile.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="field" id="field"></div>
+    <p class="legend muted" id="legend"></p>
+  </main>
+  <script type="module">
+    import { animate, set, MotionDNA, PROFILE_NAMES } from "@ultra-motion-x/web";
+    const field = document.getElementById("field");
+    const colors = ["#ff8748", "#6f8cff", "#5ee0a0", "#ffcc66", "#f472b6", "#a78bfa", "#7dd3fc", "#fca5a5", "#e5e7eb"];
+    const balls = PROFILE_NAMES.map((name, i) => {
+      const b = document.createElement("div");
+      b.className = "ball"; b.style.background = colors[i]; b.textContent = name.slice(0, 4); b.title = name;
+      field.append(b);
+      set(b, { x: 40 + i * 40, y: 40 });
+      return { b, spring: MotionDNA.profile(name).spring("bouncy"), name };
+    });
+    document.getElementById("legend").innerHTML = balls.map((x, i) => `<span style="color:${colors[i]}">● ${x.name}</span>`).join("");
+    field.addEventListener("pointerdown", (e) => {
+      const r = field.getBoundingClientRect();
+      balls.forEach((x, i) => animate(x.b, { x: e.clientX - r.left + (i - 4) * 6, y: e.clientY - r.top }, { spring: x.spring, priority: "interaction" }));
+    });
+  </script>
+</body>
+</html>

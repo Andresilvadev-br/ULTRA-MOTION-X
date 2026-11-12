@@ -1,0 +1,22 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Update & rollback — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style></style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Update & rollback</h1><p>The update/rollback flow runs in Node against a temporary copy of a fixture project. This page shows the recorded output of examples/update-rollback/run.mjs.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <p>Run it yourself:</p><pre class="out">npm run build
+node examples/update-rollback/run.mjs</pre>
+    <p class="muted">Steps: install (transaction 1) → developer edits files → simulate an older installed version → update with a failing project test (automatic rollback) → fix the project → update succeeds → full rollback removes only Ultra Motion X changes and keeps the developer's edits.</p>
+  </main>
+  <script type="module">
+    document.getElementById("status").textContent = "Node script";
+  </script>
+</body>
+</html>

@@ -1,0 +1,41 @@
+{
+  "name": "@ultra-motion-x/electron",
+  "version": "1.0.0",
+  "description": "Electron helpers for Ultra Motion X: real display refresh rate to the renderer, background-throttling policy and reduced-motion bridge.",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "umx-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./renderer": {
+      "umx-source": "./src/renderer.ts",
+      "types": "./dist/renderer.d.ts",
+      "default": "./dist/renderer.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "peerDependencies": {
+    "electron": ">=20.0.0",
+    "@ultra-motion-x/web": "^1.0.0"
+  },
+  "devDependencies": {
+    "@ultra-motion-x/web": "1.0.0"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "node --conditions=umx-source --test test/*.test.ts"
+  },
+  "peerDependenciesMeta": {
+    "electron": {
+      "optional": true
+    }
+  }
+}

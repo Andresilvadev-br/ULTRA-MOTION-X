@@ -18,6 +18,8 @@ const unitRoots = [
   "integration/test",
   "cli/test",
   "ai/mcp/test",
+  "platforms/desktop/electron/test",
+  "platforms/mobile/react-native/test",
 ];
 function collect(dir) {
   const path = join(root, dir);

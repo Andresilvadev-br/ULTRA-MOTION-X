@@ -1,0 +1,30 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Spatial UI — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.cards{display:grid;grid-template-columns:repeat(auto-fill,minmax(220px,1fr));gap:24px;perspective:1000px}.tcard{height:260px;border-radius:20px;background:linear-gradient(160deg,#1d2236,#11141d);border:1px solid var(--line);padding:18px;transform-style:preserve-3d}
+.scene{position:relative;height:300px;margin-top:32px;border-radius:20px;overflow:hidden;border:1px solid var(--line)}.layer{position:absolute;border-radius:50%;filter:blur(1px)}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Spatial UI</h1><p>Pointer tilt with depth, pointer parallax and layered depth. Intensity follows Motion DNA and is disabled under reduced motion.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="cards" id="cards"></div>
+    <div class="scene" id="scene"><div class="layer" data-depth="0.2" style="left:10%;top:20%;width:180px;height:180px;background:#3b2a6b"></div><div class="layer" data-depth="0.6" style="left:50%;top:30%;width:120px;height:120px;background:#6f8cff"></div><div class="layer" data-depth="1" style="left:30%;top:50%;width:70px;height:70px;background:#ff8748"></div></div>
+  </main>
+  <script type="module">
+    import { tilt, parallax, configureEngine } from "@ultra-motion-x/web";
+    configureEngine({ profile: "singularity" });
+    const cards = document.getElementById("cards");
+    for (let i = 0; i < 4; i++) {
+      const c = document.createElement("div");
+      c.className = "tcard"; c.innerHTML = `<b>Layer ${i + 1}</b><p class="muted">Tilt follows the pointer with spring physics.</p>`;
+      cards.append(c); tilt(c, { max: 10 });
+    }
+    parallax(document.querySelectorAll(".layer"), { range: 60 });
+  </script>
+</body>
+</html>

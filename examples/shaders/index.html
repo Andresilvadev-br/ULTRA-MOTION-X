@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Shader effects — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.bg{border-radius:20px;padding:24px;background:radial-gradient(circle at 20% 20%,#3b2a6b,transparent 50%),radial-gradient(circle at 80% 70%,#6b2a3b,transparent 50%),#0b0d14}
+.fx{height:180px;border-radius:20px;padding:16px;display:flex;flex-direction:column;justify-content:flex-end;background:rgba(255,255,255,.05);border:1px solid rgba(255,255,255,.12)}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Shader effects</h1><p>Each card is a WebGL2 material (or its CSS fallback). Blur behind glass is a CSS backdrop-filter (compositor), not a shader.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="bg"><div class="grid" id="grid"></div></div>
+    <p class="muted" id="caps"></p>
+  </main>
+  <script type="module">
+    import { surface, MATERIALS, detectCapabilities } from "@ultra-motion-x/effects";
+    const grid = document.getElementById("grid");
+    const surfaces = MATERIALS.map((m) => {
+      const card = document.createElement("div");
+      card.className = "fx"; card.innerHTML = `<b>${m}</b><small class="muted">move / click</small>`;
+      grid.append(card);
+      return surface(card, { material: m, intensity: 0.85, colors: ["#ffffff", "#7dd3fc", "#a78bfa", "#ff8748"] });
+    });
+    const caps = detectCapabilities();
+    document.getElementById("caps").textContent = `WebGL2: ${caps.webgl2} · WebGPU exposed: ${caps.webgpu} · backdrop-filter: ${caps.backdropFilter}`;
+    document.getElementById("status").textContent = surfaces.map((s) => s.backend).join(" · ");
+  </script>
+</body>
+</html>

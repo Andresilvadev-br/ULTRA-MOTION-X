@@ -1,0 +1,39 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Automatic integration — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.demo{display:grid;gap:16px;grid-template-columns:repeat(auto-fill,minmax(240px,1fr))}.card{padding:16px;border-radius:14px;background:#161a26;border:1px solid var(--line)}
+dialog{background:#151a28;color:var(--text);border:1px solid #2f3654;border-radius:14px}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Automatic integration</h1><p>Plain markup with no motion code; one call to autoEnhance() adds semantic motion. The CLI does the same in real projects: run examples/auto-integration/run.mjs.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="row"><button class="btn primary" id="on">Enable autoEnhance()</button><button class="btn" id="off">Disable</button></div>
+    <div class="demo" style="margin-top:16px">
+      <div class="card">A card <p class="muted">hover lift + press</p></div>
+      <div class="card">Another card</div>
+      <div class="card"><button class="btn" id="dlg">Open dialog</button> <button class="btn" id="tst">Toast</button></div>
+      <details class="card"><summary>Details element</summary><p>Content enters with motion when opened.</p></details>
+    </div>
+    <ul data-umx="list" id="list" style="margin-top:16px"><li>One</li><li>Two</li><li>Three</li></ul><button class="btn" id="rev">Reverse list</button>
+    <dialog id="d"><p>Native dialog — focus handling stays native.</p><button class="btn" id="close">Close</button></dialog>
+    <div id="toasts"></div>
+    <h3>CLI integration of a real project</h3>
+    <pre class="out">node examples/auto-integration/run.mjs   # analyze → plan → install → doctor → rollback on a copy of tests/fixtures/vite-react</pre>
+  </main>
+  <script type="module">
+    import { autoEnhance, openDialog, closeDialog } from "@ultra-motion-x/web";
+    let ctrl = null;
+    document.getElementById("on").onclick = () => { ctrl ??= autoEnhance(); document.getElementById("status").textContent = JSON.stringify(ctrl.stats()); };
+    document.getElementById("off").onclick = () => { ctrl?.destroy(); ctrl = null; document.getElementById("status").textContent = "disabled"; };
+    document.getElementById("dlg").onclick = () => openDialog(document.getElementById("d"));
+    document.getElementById("close").onclick = () => closeDialog(document.getElementById("d"));
+    document.getElementById("tst").onclick = () => { const t = document.createElement("div"); t.setAttribute("role", "status"); t.className = "card"; t.textContent = "Inserted toast (animated by autoEnhance)"; document.getElementById("toasts").append(t); setTimeout(() => t.remove(), 2500); };
+    document.getElementById("rev").onclick = () => { const l = document.getElementById("list"); [...l.children].reverse().forEach((c) => l.append(c)); };
+  </script>
+</body>
+</html>

@@ -1,0 +1,54 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Desktop app — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.shell{display:grid;grid-template-columns:200px 1fr;min-height:70vh;border:1px solid var(--line);border-radius:16px;overflow:hidden}
+.nav{background:#0c0f16;padding:12px;display:flex;flex-direction:column;gap:4px;position:relative}.nav button{text-align:left;background:none;border:0;color:var(--muted);padding:10px;border-radius:8px;font:inherit;cursor:pointer;position:relative;z-index:1}
+.nav button[aria-current]{color:var(--text)}.ind{position:absolute;left:12px;right:12px;height:40px;top:12px;background:#1d2236;border-radius:8px}
+.view{padding:20px}.thumbs{display:grid;grid-template-columns:repeat(auto-fill,minmax(120px,1fr));gap:12px}.thumb{aspect-ratio:4/3;border-radius:12px;background:linear-gradient(135deg,#6f8cff,#a78bfa);cursor:pointer}
+.detail{height:280px;border-radius:16px;background:linear-gradient(135deg,#6f8cff,#a78bfa)}.win{position:fixed;inset:15% 20%;background:#151a28;border:1px solid #2f3654;border-radius:14px;padding:16px;box-shadow:0 30px 80px rgba(0,0,0,.5)}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Desktop app</h1><p>Animated navigation between views, windows opening from their launcher and shared elements. Runs in a browser or Electron (see main.cjs).</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="shell">
+      <div class="nav" role="tablist"><div class="ind" id="ind"></div><button role="tab" aria-current="page" data-view="home">Home</button><button role="tab" data-view="library">Library</button><button role="tab" data-view="settings">Settings</button><button class="btn" id="launch" style="margin-top:auto">Open window</button></div>
+      <section class="view" id="view"></section>
+    </div>
+    <div class="win" id="win" hidden><div class="row" style="justify-content:space-between"><b>Preferences</b><button class="btn" id="winclose">Close</button></div><p class="muted">Opened from its launcher with openWindow(); closed with exit().</p></div>
+  </main>
+  <script type="module">
+    import { animate, sharedTransition, tabIndicator, openWindow, exit, press } from "@ultra-motion-x/web";
+    const view = document.getElementById("view");
+    const views = {
+      home: () => `<h2>Home</h2><p class="muted">Pick an item in Library to see a shared-element transition.</p>`,
+      library: () => `<h2>Library</h2><div class="thumbs">${Array.from({ length: 8 }, (_, i) => `<div class="thumb" data-i="${i}" style="filter:hue-rotate(${i * 40}deg)"></div>`).join("")}</div>`,
+      settings: () => `<h2>Settings</h2><label><input type="checkbox"> Reduce motion (follows the OS by default)</label>`,
+    };
+    async function go(name) {
+      for (const b of document.querySelectorAll("[data-view]")) b.toggleAttribute("aria-current", b.dataset.view === name);
+      tabIndicator(document.getElementById("ind"), document.querySelector(`[data-view="${name}"]`));
+      await animate(view, { opacity: 0, x: -12 }, { duration: 120, ease: "accelerate" });
+      view.innerHTML = views[name]();
+      animate(view, { opacity: [0, 1], x: [12, 0] }, { spring: "snappy" });
+      for (const t of view.querySelectorAll(".thumb")) t.onclick = async () => {
+        const hue = t.style.filter;
+        view.innerHTML = `<button class="btn" id="back">← Back</button><div class="detail" style="filter:${hue};margin-top:12px"></div>`;
+        await sharedTransition(t, view.querySelector(".detail"));
+        view.querySelector("#back").onclick = () => go("library");
+      };
+    }
+    for (const b of document.querySelectorAll("[data-view]")) { press(b); b.onclick = () => go(b.dataset.view); }
+    const win = document.getElementById("win");
+    document.getElementById("launch").onclick = () => { win.hidden = false; openWindow(win, document.getElementById("launch")); };
+    document.getElementById("winclose").onclick = async () => { await exit(win, "modal"); win.hidden = true; };
+    view.innerHTML = views.home();
+    // Inside Electron, the preload exposes the real display refresh rate.
+    if (window.umxDisplay) window.umxDisplay.refreshRate().then((hz) => (document.getElementById("status").textContent = `display ${hz} Hz (Electron)`));
+  </script>
+</body>
+</html>

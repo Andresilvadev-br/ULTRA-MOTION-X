@@ -1,0 +1,31 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Morphing — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.mcard{width:220px;height:140px;border-radius:24px;background:#1d2236;padding:16px;cursor:pointer}.mcard.big{width:min(560px,100%);height:320px;border-radius:12px}
+svg{width:120px;height:120px}path{fill:var(--accent)}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Morphing</h1><p>A card morphs into a panel (size, radius, colour continuous) and SVG icons morph between shapes. Interrupt at any time.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="row" style="align-items:flex-start;gap:32px"><div><p class="muted">Click the card</p><div class="mcard" id="card"><b>Card</b><p class="muted">Morphs into a panel</p></div></div>
+    <div><p class="muted">Click the shapes</p><div class="row"><svg viewBox="0 0 100 100" id="s1"><path id="p1" d="M30 20 L80 50 L30 80 Z"/></svg><svg viewBox="0 0 100 100" id="s2"><path id="p2" d="M50 10 A40 40 0 1 1 49.9 10 Z"/></svg></div></div></div>
+  </main>
+  <script type="module">
+    import { morphContainer, morphPath } from "@ultra-motion-x/web";
+    const card = document.getElementById("card");
+    let big = false;
+    card.onclick = () => { big = !big; morphContainer(card, () => card.classList.toggle("big", big), { background: big ? "#2a2147" : "#1d2236" }); };
+    const play = "M30 20 L80 50 L30 80 Z", pause = "M30 20 L45 20 L45 80 L30 80 Z";
+    let p1 = false;
+    document.getElementById("s1").onclick = () => { p1 = !p1; morphPath(document.getElementById("p1"), p1 ? pause : play); };
+    const circle = "M50 10 A40 40 0 1 1 49.9 10 Z", star = "M50 5 L61 38 L95 38 L67 58 L78 92 L50 72 L22 92 L33 58 L5 38 L39 38 Z";
+    let p2 = false;
+    document.getElementById("s2").onclick = () => { p2 = !p2; morphPath(document.getElementById("p2"), p2 ? star : circle, { samples: 80 }); };
+  </script>
+</body>
+</html>

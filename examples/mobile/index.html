@@ -1,0 +1,60 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Mobile interface — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.phone{max-width:390px;height:720px;margin:0 auto;border:1px solid var(--line);border-radius:36px;overflow:hidden;position:relative;background:#0e1119}
+.tabs{display:flex;position:relative;border-bottom:1px solid var(--line)}.tabs button{flex:1;background:none;border:0;color:var(--muted);padding:14px;font:inherit}.tabs button[aria-selected=true]{color:var(--text)}
+.bar{position:absolute;bottom:0;left:0;height:2px;background:var(--accent);width:80px}.pages{display:flex;width:300%;height:calc(100% - 50px);touch-action:pan-y}.page{width:33.333%;padding:16px;overflow:auto}
+.item{padding:14px;background:#161a26;border-radius:12px;margin-bottom:10px}.sheet{position:absolute;left:0;right:0;top:0;height:100%;background:#151a28;border-radius:24px 24px 0 0;padding:12px 16px;box-shadow:0 -20px 40px rgba(0,0,0,.4)}
+.grab{width:40px;height:5px;border-radius:3px;background:#3a4057;margin:0 auto 12px}.refresh{text-align:center;color:var(--muted);height:0;overflow:visible}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Mobile interface</h1><p>Bottom sheet with snap points and momentum, swipeable tabs, pull to refresh. Use device emulation or a phone.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="phone" id="phone">
+      <div class="tabs" role="tablist"><button role="tab" aria-selected="true">Feed</button><button role="tab" aria-selected="false">Saved</button><button role="tab" aria-selected="false">Profile</button><div class="bar" id="bar"></div></div>
+      <div class="pages" id="pages">
+        <div class="page" id="feed"><div class="refresh" id="refresh">↓ pull to refresh</div></div>
+        <div class="page"><div class="item">Saved items appear here.</div></div>
+        <div class="page"><div class="item">Profile</div></div>
+      </div>
+      <div class="sheet" id="sheet" role="dialog" aria-label="Quick actions"><div class="grab"></div><b>Quick actions</b><p class="muted">Drag the sheet; it snaps to peek, half and full with momentum.</p><div class="item">Share</div><div class="item">Duplicate</div><div class="item">Archive</div></div>
+    </div>
+  </main>
+  <script type="module">
+    import { animate, drag, gestures, tabIndicator, rubberBand, press } from "@ultra-motion-x/web";
+    const feed = document.getElementById("feed");
+    for (let i = 1; i <= 12; i++) feed.insertAdjacentHTML("beforeend", `<div class="item">Post #${i}</div>`);
+    for (const el of document.querySelectorAll(".item,.tabs button")) press(el);
+    const phone = document.getElementById("phone");
+    const H = phone.clientHeight;
+    const snaps = [H - 90, H * 0.5, 60];
+    const sheet = drag(document.getElementById("sheet"), { axis: "y", bounds: { top: 60, bottom: H - 90 }, snapY: snaps });
+    sheet.y.set(H - 90);
+    const tabs = [...document.querySelectorAll("[role=tab]")];
+    let index = 0;
+    const pages = document.getElementById("pages");
+    const show = (i) => {
+      index = Math.max(0, Math.min(2, i));
+      tabs.forEach((t, k) => t.setAttribute("aria-selected", String(k === index)));
+      tabIndicator(document.getElementById("bar"), tabs[index]);
+      animate(pages, { x: -index * phone.clientWidth }, { spring: "snappy" });
+    };
+    tabs.forEach((t, i) => (t.onclick = () => show(i)));
+    gestures(pages, { onSwipe: (e) => e.direction === "left" ? show(index + 1) : e.direction === "right" ? show(index - 1) : null });
+    let pulling = 0;
+    gestures(feed, {
+      onPan: (p) => { if (feed.scrollTop > 0 || p.dy < 0) return; pulling = rubberBand(p.dy, 300); animate(feed, { y: pulling }, { type: "instant" }); },
+      onPanEnd: async () => {
+        if (pulling > 60) { document.getElementById("refresh").textContent = "refreshing…"; await new Promise((r) => setTimeout(r, 700)); document.getElementById("refresh").textContent = "↓ pull to refresh"; }
+        pulling = 0; animate(feed, { y: 0 }, { spring: "bouncy" });
+      },
+    });
+    requestAnimationFrame(() => show(0));
+  </script>
+</body>
+</html>

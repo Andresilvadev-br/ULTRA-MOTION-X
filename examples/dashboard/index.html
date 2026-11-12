@@ -1,0 +1,63 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Web dashboard — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.layout{display:grid;grid-template-columns:220px 1fr;gap:16px}.side a{display:block;padding:8px 10px;border-radius:8px;color:var(--text);text-decoration:none}.side a:hover{background:#1d2236}
+.kpi b{font-size:28px;display:block}.list{list-style:none;margin:0;padding:0;display:flex;flex-direction:column;gap:8px}.list li{padding:10px 12px;background:#161a26;border-radius:10px;display:flex;justify-content:space-between}
+.drawer{position:fixed;top:0;bottom:0;right:0;width:320px;background:#121624;border-left:1px solid var(--line);padding:20px}
+.toasts{position:fixed;bottom:16px;right:16px;display:flex;flex-direction:column;gap:8px}.toast{background:#1d2236;border:1px solid #2f3654;padding:10px 14px;border-radius:10px}
+@media(max-width:700px){.layout{grid-template-columns:1fr}.side{display:none}}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Web dashboard</h1><p>autoEnhance() + explicit APIs on a typical dashboard. Nothing in the markup is framework-specific.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="layout">
+      <nav class="side panel"><a href="#">Overview</a><a href="#">Revenue</a><a href="#">Customers</a><a href="#">Settings</a></nav>
+      <div style="display:flex;flex-direction:column;gap:16px">
+        <div class="grid">
+          <div class="card panel kpi"><span class="muted">Revenue</span><b data-count="48210">0</b></div>
+          <div class="card panel kpi"><span class="muted">Active users</span><b data-count="1893">0</b></div>
+          <div class="card panel kpi"><span class="muted">Conversion %</span><b data-count="4.7" data-decimals="1">0</b></div>
+          <div class="card panel kpi"><span class="muted">Tickets</span><b data-count="37">0</b></div>
+        </div>
+        <div class="panel"><div class="row" style="justify-content:space-between"><b>Top accounts</b><span class="row"><button class="btn" id="shuffle">Shuffle</button><button class="btn" id="add">Add</button><button class="btn" id="open">Details</button><button class="btn primary" id="notify">Notify</button></span></div>
+          <ul class="list" id="accounts" data-umx="list"><li>Acme <span>$12.4k</span></li><li>Globex <span>$9.1k</span></li><li>Initech <span>$7.8k</span></li><li>Umbrella <span>$5.2k</span></li></ul></div>
+      </div>
+    </div>
+    <aside class="drawer" id="drawer" aria-label="Details"><b>Details</b><p class="muted">Drag it right to close, or press the button again.</p><button class="btn" id="close">Close</button></aside>
+    <div class="toasts" id="toasts" aria-live="polite"></div>
+  </main>
+  <script type="module">
+    import { animate, autoEnhance, drag, layoutTransition, exitAndRemove } from "@ultra-motion-x/web";
+    const auto = autoEnhance({ lists: false });
+    // KPI counters: animate plain objects, render with requestAnimationFrame-free callbacks.
+    for (const el of document.querySelectorAll("[data-count]")) {
+      const state = { v: 0 };
+      const d = Number(el.dataset.decimals ?? 0);
+      animate(state, { v: Number(el.dataset.count) }, { type: "tween", duration: 900, ease: "expoOut", onUpdate: () => (el.textContent = state.v.toLocaleString(undefined, { maximumFractionDigits: d, minimumFractionDigits: d })) });
+    }
+    const list = document.getElementById("accounts");
+    document.getElementById("shuffle").onclick = () => layoutTransition(list, () => { const items = [...list.children]; items.sort(() => Math.random() - 0.5).forEach((i) => list.append(i)); }, { mode: "position" });
+    let n = 0;
+    document.getElementById("add").onclick = () => layoutTransition(list, () => { const li = document.createElement("li"); li.innerHTML = `New account ${++n} <span>$${(Math.random() * 9 + 1).toFixed(1)}k</span>`; li.onclick = () => exitAndRemove(li); list.prepend(li); });
+    const drawer = document.getElementById("drawer");
+    let open = false;
+    const ctrl = drag(drawer, { axis: "x", bounds: { left: 0, right: 340 }, snapX: [0, 340], onEnd: (i) => (open = i.x < 170) });
+    const setOpen = (o) => { open = o; ctrl.moveTo(o ? 0 : 340, 0); };
+    ctrl.x.set(340);
+    document.getElementById("open").onclick = () => setOpen(!open);
+    document.getElementById("close").onclick = () => setOpen(false);
+    document.getElementById("notify").onclick = () => {
+      const t = document.createElement("div");
+      t.className = "toast"; t.setAttribute("role", "status"); t.textContent = "Report exported";
+      document.getElementById("toasts").append(t);
+      setTimeout(() => exitAndRemove(t), 2500);
+    };
+    document.getElementById("status").textContent = `enhanced: ${JSON.stringify(auto.stats())}`;
+  </script>
+</body>
+</html>

@@ -1,0 +1,53 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Game engine UI — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.game{position:relative;height:440px;border-radius:16px;overflow:hidden;border:1px solid var(--line)}canvas{width:100%;height:100%;display:block;background:#05070b}
+.hud{position:absolute;inset:12px;pointer-events:none;display:flex;justify-content:space-between;align-items:flex-start}.score{font-size:28px;font-weight:800}.hp{width:180px;height:10px;border-radius:5px;background:#2a2f3d;overflow:hidden}.hp div{height:100%;background:#5ee0a0;transform-origin:left}
+.menu{position:absolute;top:0;bottom:0;left:0;width:280px;background:rgba(17,20,29,.92);padding:20px}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Game engine UI</h1><p>A canvas game loop renders the world; Ultra Motion X animates only the HUD (score pop, health bar, pause menu, damage shake). Native engine samples: platforms/unity, platforms/godot, platforms/unreal.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="game" id="game"><canvas id="c"></canvas><div class="hud"><div class="score" id="score">0</div><div class="hp"><div id="hp"></div></div></div><div class="menu" id="menu"><h2>Paused</h2><p class="muted">Esc to resume. UI animates while the game loop is paused.</p></div></div>
+    <p class="muted">Move with the mouse; collect green orbs, avoid red ones. Esc pauses.</p>
+  </main>
+  <script type="module">
+    import { animate, progressTo, set } from "@ultra-motion-x/web";
+    const c = document.getElementById("c"), ctx = c.getContext("2d");
+    const resize = () => { c.width = c.clientWidth; c.height = c.clientHeight; };
+    resize(); addEventListener("resize", resize);
+    let score = 0, hp = 1, paused = false, px = c.width / 2, py = c.height / 2, last = performance.now();
+    const orbs = Array.from({ length: 14 }, () => ({ x: Math.random() * c.width, y: Math.random() * c.height, vx: (Math.random() - 0.5) * 120, vy: (Math.random() - 0.5) * 120, bad: Math.random() < 0.3 }));
+    c.addEventListener("pointermove", (e) => { const r = c.getBoundingClientRect(); px = e.clientX - r.left; py = e.clientY - r.top; });
+    const scoreEl = document.getElementById("score");
+    const hit = (o) => {
+      if (o.bad) { hp = Math.max(0, hp - 0.2); progressTo(document.getElementById("hp"), hp); animate("#game", { x: [0, -10, 8, -5, 0] }, { duration: 260 }); }
+      else { score += 10; scoreEl.textContent = score; animate(scoreEl, { scale: [1, 1.4, 1] }, { duration: 300, ease: "backOut" }); }
+      o.x = Math.random() * c.width; o.y = Math.random() * c.height;
+    };
+    function loop(t) {
+      const dt = Math.min(0.05, (t - last) / 1000); last = t;
+      if (!paused) {
+        ctx.fillStyle = "#05070b"; ctx.fillRect(0, 0, c.width, c.height);
+        for (const o of orbs) {
+          o.x += o.vx * dt; o.y += o.vy * dt;
+          if (o.x < 0 || o.x > c.width) o.vx *= -1;
+          if (o.y < 0 || o.y > c.height) o.vy *= -1;
+          if (Math.hypot(o.x - px, o.y - py) < 22) hit(o);
+          ctx.fillStyle = o.bad ? "#ff5d73" : "#5ee0a0"; ctx.beginPath(); ctx.arc(o.x, o.y, 8, 0, 7); ctx.fill();
+        }
+        ctx.fillStyle = "#ff8748"; ctx.beginPath(); ctx.arc(px, py, 12, 0, 7); ctx.fill();
+      }
+      requestAnimationFrame(loop);
+    }
+    requestAnimationFrame(loop);
+    addEventListener("keydown", (e) => { if (e.key !== "Escape") return; paused = !paused; animate("#menu", { x: paused ? 0 : -300 }, { spring: "snappy", priority: "interaction" }); });
+    set("#menu", { x: -300 });
+  </script>
+</body>
+</html>

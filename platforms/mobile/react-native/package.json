@@ -1,0 +1,40 @@
+{
+  "name": "@ultra-motion-x/react-native",
+  "version": "1.0.0",
+  "description": "React Native adapter for Ultra Motion X: physics-driven values (springs, inertia, motion graphs) pushed into Animated.Value or setNativeProps.",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "umx-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src"
+  ],
+  "peerDependencies": {
+    "react": ">=17.0.0",
+    "react-native": ">=0.70.0",
+    "@ultra-motion-x/web": "^1.0.0"
+  },
+  "devDependencies": {
+    "@ultra-motion-x/web": "1.0.0"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "node --conditions=umx-source --test test/*.test.ts"
+  },
+  "peerDependenciesMeta": {
+    "react": {
+      "optional": true
+    },
+    "react-native": {
+      "optional": true
+    }
+  }
+}

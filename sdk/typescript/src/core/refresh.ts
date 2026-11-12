@@ -47,6 +47,16 @@ export class RefreshEstimator {
     return false;
   }
 
+  /** Seeds the estimate with a platform-reported rate (e.g. Electron's displayFrequency). */
+  hint(hz: number): void {
+    if (!Number.isFinite(hz) || hz <= 0) return;
+    const snapped = snapRate(hz);
+    if (snapped !== this.hz) this.changes++;
+    this.hz = snapped;
+    this.intervals.clear();
+    this.last = null;
+  }
+
   breakContinuity(): void {
     this.last = null;
   }

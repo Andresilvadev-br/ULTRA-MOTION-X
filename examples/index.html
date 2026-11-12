@@ -1,0 +1,36 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Ultra Motion X — Examples</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js"}}</script>
+  <style>.card{display:block;text-decoration:none;color:inherit} .card h2{font-size:15px;margin:0 0 4px} .card p{margin:0;color:var(--muted);font-size:13px} .n{color:var(--accent);font-weight:700;margin-right:6px}</style>
+</head>
+<body>
+  <header class="ex"><div><h1>Ultra Motion X — Examples</h1><p>Every example uses the public API of the compiled SDK. Studio: <a href="/studio/index.html">/studio</a></p></div></header>
+  <main class="ex">
+    <div class="grid" id="list">
+      <a class="card panel" href="/examples/dashboard/"><h2><span class="n">1</span>Web dashboard</h2><p>Auto-enhanced cards, KPI counters, FLIP list, drawer, notifications.</p></a>
+      <a class="card panel" href="/examples/desktop-app/"><h2><span class="n">2</span>Desktop app</h2><p>App shell with animated navigation, windows and shared elements (runs in Electron too).</p></a>
+      <a class="card panel" href="/examples/mobile/"><h2><span class="n">3</span>Mobile interface</h2><p>Bottom sheet with snap points, swipeable tabs, pull-to-refresh.</p></a>
+      <a class="card panel" href="/examples/spring/"><h2><span class="n">4</span>Spring physics</h2><p>Profiles, retargeting with momentum, live parameters.</p></a>
+      <a class="card panel" href="/examples/motion-graph/"><h2><span class="n">5</span>Motion graph</h2><p>MDL compiled in WebAssembly, events and gesture hand-off.</p></a>
+      <a class="card panel" href="/examples/morphing/"><h2><span class="n">6</span>Morphing</h2><p>Container morphs and SVG path morphing.</p></a>
+      <a class="card panel" href="/examples/gestures/"><h2><span class="n">7</span>Gestures &amp; inertia</h2><p>Carousel fling-to-snap, pinch zoom, rubber banding.</p></a>
+      <a class="card panel" href="/examples/shaders/"><h2><span class="n">8</span>Shaders</h2><p>Glass, ripple, gradient, lighting, noise, refraction with fallbacks.</p></a>
+      <a class="card panel" href="/examples/spatial/"><h2><span class="n">9</span>Spatial UI</h2><p>Tilt, parallax and depth layers.</p></a>
+      <a class="card panel" href="/examples/adaptive-fidelity/"><h2><span class="n">10</span>Adaptive fidelity</h2><p>Particles under synthetic load; watch quality adapt with hysteresis.</p></a>
+      <a class="card panel" href="/examples/auto-integration/"><h2><span class="n">11</span>Automatic integration</h2><p>autoEnhance on plain markup + CLI integration script.</p></a>
+      <a class="card panel" href="/examples/update-rollback/"><h2><span class="n">12</span>Update &amp; rollback</h2><p>Scripted update with failing tests → automatic rollback.</p></a>
+      <a class="card panel" href="/examples/game-ui/"><h2><span class="n">13</span>Game engine UI</h2><p>Canvas game with UMX-driven HUD + Unity/Godot/Unreal samples.</p></a>
+    </div>
+  </main>
+  <script type="module">
+    import { animate, autoEnhance } from "@ultra-motion-x/web";
+    autoEnhance();
+    animate(".card", { opacity: [0, 1], y: [16, 0] }, { stagger: 30, spring: "standard" });
+  </script>
+</body>
+</html>

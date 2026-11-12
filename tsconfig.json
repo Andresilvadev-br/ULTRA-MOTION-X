@@ -27,6 +27,12 @@
     },
     {
       "path": "sdk/framework-adapters/svelte"
+    },
+    {
+      "path": "platforms/desktop/electron"
+    },
+    {
+      "path": "platforms/mobile/react-native"
     }
   ]
 }

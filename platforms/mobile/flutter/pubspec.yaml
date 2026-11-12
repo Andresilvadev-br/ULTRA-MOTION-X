@@ -1,0 +1,10 @@
+name: ultra_motion_x
+description: Ultra Motion X for Flutter — analytic springs, inertia and motion graphs from the shared native core via dart:ffi.
+version: 1.0.0
+environment:
+  sdk: ">=3.0.0 <4.0.0"
+  flutter: ">=3.10.0"
+dependencies:
+  ffi: ^2.1.0
+  flutter:
+    sdk: flutter

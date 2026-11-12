@@ -1,0 +1,37 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Adaptive fidelity — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>canvas{width:100%;height:340px;border-radius:16px;background:#0b0d14;display:block}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Adaptive fidelity</h1><p>Add synthetic main-thread load: missed frames lower the fidelity level (fewer particles, cheaper effects) with hysteresis; remove load and it recovers slowly.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="row"><label>Synthetic load per frame <input type="range" id="load" min="0" max="40" value="0"> <output id="loadOut">0 ms</output></label><button class="btn" id="burst">Burst</button></div>
+    <canvas id="c"></canvas>
+    <pre class="out" id="out"></pre>
+  </main>
+  <script type="module">
+    import { getEngine, ParticleSystem } from "@ultra-motion-x/web";
+    const engine = getEngine();
+    const canvas = document.getElementById("c");
+    const ps = new ParticleSystem(canvas, { capacity: 4000, forces: [{ kind: "gravity", x: 0, y: -40 }, { kind: "turbulence", strength: 120, scale: 80 }], color: "rgba(255,150,90,1)" });
+    const e = ps.emitter({ x: canvas.clientWidth / 2, y: 320, rate: 900, spread: Math.PI / 2, speed: [60, 180], life: [1.2, 2.6], size: [1.5, 3.5] });
+    let load = 0;
+    document.getElementById("load").oninput = (ev) => { load = Number(ev.target.value); document.getElementById("loadOut").textContent = `${load} ms`; };
+    document.getElementById("burst").onclick = () => ps.burst(e, 600);
+    // Synthetic load: a busy-wait in the engine's update phase (only for this demonstration).
+    engine.on("frame", () => { const t = performance.now(); while (performance.now() - t < load) {} });
+    const changes = [];
+    engine.on("fidelity", (c) => changes.unshift(`${c.from} → ${c.to} (${c.reason})`));
+    setInterval(() => {
+      const r = engine.report();
+      document.getElementById("out").textContent = `fidelity level ${engine.fidelity.level}   particles alive ${ps.particles.length / 4}   emission factor ${engine.fidelitySettings.particles}\nframe interval p50 ${r.frameInterval.p50.toFixed(1)} ms   p95 ${r.frameInterval.p95.toFixed(1)} ms   refresh ${r.refreshHz.provenance === "unavailable" ? "?" : r.refreshHz.value} Hz\nchanges: ${changes.slice(0, 6).join(", ") || "none yet"}`;
+    }, 300);
+  </script>
+</body>
+</html>

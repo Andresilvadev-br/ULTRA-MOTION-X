@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <link rel="icon" href="data:,">
+  <title>Motion graph — Ultra Motion X</title>
+  <link rel="stylesheet" href="/examples/shared.css">
+  <script type="importmap">{"imports":{"@ultra-motion-x/web":"/sdk/typescript/dist/index.js","@ultra-motion-x/web/wasm":"/sdk/typescript/dist/wasm/index.js","@ultra-motion-x/effects":"/rendering/web/dist/index.js","@ultra-motion-x/devtools":"/devtools/dist/index.js"}}</script>
+  <style>.stage{position:relative;height:60vh;overflow:hidden;border-radius:16px;border:1px solid var(--line)}.scrim{position:absolute;inset:0;background:#000;opacity:0;pointer-events:none}
+.drawer{position:absolute;top:0;bottom:0;left:0;width:320px;background:#151a28;border-right:1px solid #2f3654;padding:16px}.handle{position:absolute;right:-28px;top:50%;width:28px;height:64px;margin-top:-32px;background:#151a28;border:1px solid #2f3654;border-left:0;border-radius:0 10px 10px 0;cursor:grab;touch-action:none}</style>
+</head>
+<body>
+  <header class="ex"><div><a class="back" href="/examples/">← Examples</a><h1>Motion graph</h1><p>The drawer is defined in Motion Design Language (examples/mdl/app.umx.json), compiled by the Rust compiler in WebAssembly and executed by the web runtime. Drag the handle to hand off between gesture and graph.</p></div><span class="chip" id="status">ready</span></header>
+  <main class="ex">
+    <div class="row"><button class="btn primary" id="toggle">toggle</button><button class="btn" id="dismiss">dismiss</button><span class="chip" id="state"></span></div>
+    <div class="stage" id="stage"><div class="scrim" id="scrim"></div><aside class="drawer" id="drawer"><b>Drawer</b><p class="muted">Defined in MDL: states, spring tokens, scrim relation, drag gesture with snap points.</p><div class="handle" id="handle" aria-label="Drag handle"></div></aside></div>
+  </main>
+  <script type="module">
+    import { graphFromPlan, PointerTracker, selectSnapPoint, projectRelease } from "@ultra-motion-x/web";
+    import { loadCore } from "@ultra-motion-x/web/wasm";
+    const core = await loadCore();
+    const src = await (await fetch("/examples/mdl/app.umx.json")).text();
+    const out = core.compile(src);
+    if (!out.ok) throw new Error(out.diagnostics.map((d) => d.message).join("; "));
+    const g = graphFromPlan(out.plan, "drawer");
+    g.bind(document.getElementById("drawer"), { scrim: "" });
+    g.bind(document.getElementById("scrim"), { x: "", scrim: "opacity" });
+    const state = document.getElementById("state");
+    const show = () => (state.textContent = `state: ${g.state}`);
+    g.on(show); show();
+    document.getElementById("toggle").onclick = () => g.send("toggle");
+    document.getElementById("dismiss").onclick = () => g.send("dismiss");
+    const gesture = out.plan.components.drawer.gestures[0];
+    let start = 0;
+    new PointerTracker(document.getElementById("handle"), {
+      onDown: () => { g.beginGesture("x"); start = g.get("x"); },
+      onMove: (p) => g.setGestureValue("x", start + p.x - p.startX, PointerTracker.velocity(p).x),
+      onUp: (p) => {
+        const v = PointerTracker.velocity(p).x;
+        const target = selectSnapPoint(projectRelease(g.get("x"), v), gesture.snapPoints);
+        const state = gesture.snapStates[gesture.snapPoints.indexOf(target)];
+        g.endGesture("x", v, g.state === state ? undefined : "toggle");
+      },
+      onCancel: () => g.endGesture("x", 0),
+    });
+    document.getElementById("status").textContent = `compiler ${core.version} (WASM)`;
+  </script>
+</body>
+</html>
