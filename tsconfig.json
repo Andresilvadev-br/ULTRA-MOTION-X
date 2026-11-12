@@ -9,6 +9,12 @@
     },
     {
       "path": "devtools"
+    },
+    {
+      "path": "integration"
+    },
+    {
+      "path": "cli"
     }
   ]
 }

@@ -1,0 +1,31 @@
+{
+  "name": "@ultra-motion-x/integration",
+  "version": "1.0.0",
+  "description": "Ultra Motion X Universal Integration Engine: project analysis, compatibility checks, planned installation, rollback, self-healing and controlled updates.",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "umx-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    }
+  },
+  "files": [
+    "dist",
+    "src",
+    "migrations"
+  ],
+  "dependencies": {
+    "@ultra-motion-x/web": "1.0.0"
+  },
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "node --conditions=umx-source --test test/*.test.ts"
+  }
+}

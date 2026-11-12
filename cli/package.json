@@ -1,0 +1,35 @@
+{
+  "name": "@ultra-motion-x/cli",
+  "version": "1.0.0",
+  "description": "Ultra Motion X command line: analyze, install, validate, compile, benchmark, diagnose, update and roll back.",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "bin": {
+    "umx": "./bin/umx.mjs",
+    "ultra-motion-x": "./bin/umx.mjs"
+  },
+  "main": "./dist/main.js",
+  "exports": {
+    ".": {
+      "umx-source": "./src/main.ts",
+      "types": "./dist/main.d.ts",
+      "default": "./dist/main.js"
+    }
+  },
+  "files": [
+    "bin",
+    "dist",
+    "src"
+  ],
+  "dependencies": {
+    "@ultra-motion-x/integration": "1.0.0",
+    "@ultra-motion-x/web": "1.0.0"
+  },
+  "engines": {
+    "node": ">=20.11"
+  },
+  "scripts": {
+    "build": "tsc -b",
+    "test": "node --conditions=umx-source --test test/*.test.ts"
+  }
+}

@@ -1,0 +1,13 @@
+{
+  "$comment": "Release migration metadata consumed by `umx update`. Each entry describes what changed in that version and the steps the updater (or a human) must perform. Breaking entries require --allow-major.",
+  "migrations": [
+    {
+      "version": "1.0.0",
+      "breaking": false,
+      "summary": "Initial release. MDL documents in umx/0 are migrated automatically to umx/1 (variants → states, tension/friction → stiffness/damping, seconds → milliseconds).",
+      "steps": [
+        "Run `umx migrate <file> --write` to rewrite umx/0 documents on disk (optional; the compiler migrates transparently)."
+      ]
+    }
+  ]
+}

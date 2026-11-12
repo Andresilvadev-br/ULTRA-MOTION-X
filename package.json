@@ -11,7 +11,9 @@
   "workspaces": [
     "sdk/typescript",
     "rendering/web",
-    "devtools"
+    "devtools",
+    "integration",
+    "cli"
   ],
   "scripts": {
     "gen": "node scripts/gen-tokens.mjs && node scripts/build-wasm.mjs",
