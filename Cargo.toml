@@ -24,7 +24,7 @@ authors = ["Ultra Motion X contributors"]
 [workspace.dependencies]
 libm = "0.2.16"
 serde = { version = "1.0.229", features = ["derive"] }
-serde_json = "1.0.154"
+serde_json = { version = "1.0.154", features = ["float_roundtrip"] }
 umx-physics = { path = "engine/physics", version = "1.0.0" }
 umx-core = { path = "engine/core", version = "1.0.0" }
 umx-graph = { path = "engine/motion-graph", version = "1.0.0" }

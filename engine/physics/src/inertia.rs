@@ -27,7 +27,11 @@ impl Default for InertiaParams {
     fn default() -> Self {
         Self {
             decay: DecayParams::default(),
-            bounce_spring: SpringParams { stiffness: 500.0, damping: 40.0, ..SpringParams::default() },
+            bounce_spring: SpringParams {
+                stiffness: 500.0,
+                damping: 40.0,
+                ..SpringParams::default()
+            },
             min: None,
             max: None,
             snap_points: Vec::new(),
@@ -40,7 +44,11 @@ enum Phase {
     /// Pure spring (started out of bounds or snapping).
     Spring(Spring),
     /// Decay, then a spring starting at `switch_time`.
-    DecayThenSpring { decay: Decay, switch_time: f64, spring: Spring },
+    DecayThenSpring {
+        decay: Decay,
+        switch_time: f64,
+        spring: Spring,
+    },
     /// Decay only (never hits a bound).
     Decay(Decay),
 }
@@ -56,20 +64,32 @@ impl Inertia {
     pub fn new(params: &InertiaParams, from: f64, velocity: f64) -> Result<Self, PhysicsError> {
         check_finite("from", from)?;
         check_finite("velocity", velocity)?;
-        let (min, max) = (params.min.unwrap_or(f64::NEG_INFINITY), params.max.unwrap_or(f64::INFINITY));
+        let (min, max) = (
+            params.min.unwrap_or(f64::NEG_INFINITY),
+            params.max.unwrap_or(f64::INFINITY),
+        );
         // Out of bounds at release: spring straight back (keeping the release velocity).
         if from < min || from > max {
             let bound = if from < min { min } else { max };
             let spring = Spring::new(params.bounce_spring, from, bound, velocity)?;
-            return Ok(Self { phase: Phase::Spring(spring), target: bound });
+            return Ok(Self {
+                phase: Phase::Spring(spring),
+                target: bound,
+            });
         }
         let decay = Decay::new(params.decay, from, velocity)?;
         if !params.snap_points.is_empty() {
             let projected = decay.projected_end().max(min).min(max);
-            let snap = select_snap_point(projected, &params.snap_points).unwrap_or(projected).max(min).min(max);
+            let snap = select_snap_point(projected, &params.snap_points)
+                .unwrap_or(projected)
+                .max(min)
+                .min(max);
             // Snapping: a single spring towards the snap point carries the fling momentum.
             let spring = Spring::new(params.bounce_spring, from, snap, velocity)?;
-            return Ok(Self { phase: Phase::Spring(spring), target: snap });
+            return Ok(Self {
+                phase: Phase::Spring(spring),
+                target: snap,
+            });
         }
         let end = decay.projected_end();
         let bound = if end > max {
@@ -83,9 +103,19 @@ impl Inertia {
             Some((b, t)) => {
                 let (state, _) = decay.sample(t);
                 let spring = Spring::new(params.bounce_spring, b, b, state.velocity)?;
-                Ok(Self { phase: Phase::DecayThenSpring { decay, switch_time: t, spring }, target: b })
+                Ok(Self {
+                    phase: Phase::DecayThenSpring {
+                        decay,
+                        switch_time: t,
+                        spring,
+                    },
+                    target: b,
+                })
             }
-            None => Ok(Self { phase: Phase::Decay(decay), target: end }),
+            None => Ok(Self {
+                phase: Phase::Decay(decay),
+                target: end,
+            }),
         }
     }
 
@@ -97,7 +127,11 @@ impl Inertia {
     pub fn finish_time(&self) -> f64 {
         match &self.phase {
             Phase::Spring(s) => s.finish_time(),
-            Phase::DecayThenSpring { switch_time, spring, .. } => switch_time + spring.finish_time(),
+            Phase::DecayThenSpring {
+                switch_time,
+                spring,
+                ..
+            } => switch_time + spring.finish_time(),
             Phase::Decay(d) => d.finish_time(),
         }
     }
@@ -109,7 +143,11 @@ impl Inertia {
                 (MotionState::new(st.position, st.velocity), st.done)
             }
             Phase::Decay(d) => d.sample(t),
-            Phase::DecayThenSpring { decay, switch_time, spring } => {
+            Phase::DecayThenSpring {
+                decay,
+                switch_time,
+                spring,
+            } => {
                 if t < *switch_time {
                     let (s, _) = decay.sample(t);
                     (s, false)
@@ -136,7 +174,10 @@ mod tests {
 
     #[test]
     fn bounces_off_max_with_continuity() {
-        let p = InertiaParams { max: Some(100.0), ..InertiaParams::default() };
+        let p = InertiaParams {
+            max: Some(100.0),
+            ..InertiaParams::default()
+        };
         let i = Inertia::new(&p, 0.0, 2000.0).unwrap();
         assert_eq!(i.target(), 100.0);
         // Find switch and check continuity across it.
@@ -155,7 +196,11 @@ mod tests {
 
     #[test]
     fn released_out_of_bounds_springs_back() {
-        let p = InertiaParams { min: Some(0.0), max: Some(100.0), ..InertiaParams::default() };
+        let p = InertiaParams {
+            min: Some(0.0),
+            max: Some(100.0),
+            ..InertiaParams::default()
+        };
         let i = Inertia::new(&p, -40.0, -100.0).unwrap();
         assert_eq!(i.target(), 0.0);
         assert!(i.sample(i.finish_time() + 0.1).1);
@@ -163,7 +208,10 @@ mod tests {
 
     #[test]
     fn snaps_to_projected_point() {
-        let p = InertiaParams { snap_points: vec![0.0, 300.0, 600.0], ..InertiaParams::default() };
+        let p = InertiaParams {
+            snap_points: vec![0.0, 300.0, 600.0],
+            ..InertiaParams::default()
+        };
         // projection = 50 + 900*0.325 ≈ 342 → snap 300
         let i = Inertia::new(&p, 50.0, 900.0).unwrap();
         assert_eq!(i.target(), 300.0);

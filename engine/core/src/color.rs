@@ -54,14 +54,29 @@ impl Rgba {
         let h = hex.strip_prefix('#')?;
         let expand = |s: &str| -> Option<Vec<u8>> {
             match s.len() {
-                3 | 4 => s.chars().map(|c| u8::from_str_radix(&format!("{c}{c}"), 16).ok()).collect(),
-                6 | 8 => (0..s.len()).step_by(2).map(|i| u8::from_str_radix(s.get(i..i + 2)?, 16).ok()).collect(),
+                3 | 4 => s
+                    .chars()
+                    .map(|c| u8::from_str_radix(&format!("{c}{c}"), 16).ok())
+                    .collect(),
+                6 | 8 => (0..s.len())
+                    .step_by(2)
+                    .map(|i| u8::from_str_radix(s.get(i..i + 2)?, 16).ok())
+                    .collect(),
                 _ => None,
             }
         };
         let v = expand(h)?;
-        let a = if v.len() == 4 { f64::from(v[3]) / 255.0 } else { 1.0 };
-        Some(Rgba { r: f64::from(v[0]) / 255.0, g: f64::from(v[1]) / 255.0, b: f64::from(v[2]) / 255.0, a })
+        let a = if v.len() == 4 {
+            f64::from(v[3]) / 255.0
+        } else {
+            1.0
+        };
+        Some(Rgba {
+            r: f64::from(v[0]) / 255.0,
+            g: f64::from(v[1]) / 255.0,
+            b: f64::from(v[2]) / 255.0,
+            a,
+        })
     }
 
     pub fn to_hex(self) -> String {
@@ -69,7 +84,13 @@ impl Rgba {
         if self.a >= 1.0 {
             format!("#{:02x}{:02x}{:02x}", c(self.r), c(self.g), c(self.b))
         } else {
-            format!("#{:02x}{:02x}{:02x}{:02x}", c(self.r), c(self.g), c(self.b), c(self.a))
+            format!(
+                "#{:02x}{:02x}{:02x}{:02x}",
+                c(self.r),
+                c(self.g),
+                c(self.b),
+                c(self.a)
+            )
         }
     }
 }
@@ -110,7 +131,9 @@ mod tests {
 
     #[test]
     fn roundtrip() {
-        for hex in ["#ff0000", "#00ff00", "#0000ff", "#123456", "#ffffff", "#000000", "#7f7f7f"] {
+        for hex in [
+            "#ff0000", "#00ff00", "#0000ff", "#123456", "#ffffff", "#000000", "#7f7f7f",
+        ] {
             let c = Rgba::from_hex(hex).unwrap();
             assert_eq!(c.to_oklab().to_rgba().to_hex(), hex);
         }

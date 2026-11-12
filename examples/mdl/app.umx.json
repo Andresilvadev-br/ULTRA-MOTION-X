@@ -1,0 +1,83 @@
+{
+  "$schema": "../../docs/schema/mdl-1.schema.json",
+  "version": "umx/1",
+  "name": "example-app",
+  "profile": "fluid",
+  "tokens": {
+    "spring": {
+      "drawer": { "stiffness": 380, "damping": 34, "mass": 1 },
+      "pop": { "response": 0.3, "dampingRatio": 0.6 }
+    },
+    "duration": { "toast": 240 },
+    "easing": { "brand": [0.2, 0, 0, 1] }
+  },
+  "transitions": {
+    "drawerSpring": { "type": "spring", "spring": "$spring.drawer" },
+    "fadeFast": { "type": "tween", "duration": "$duration.fast", "easing": "$easing.exit" },
+    "pop": "$spring.pop"
+  },
+  "components": {
+    "drawer": {
+      "role": "drawer",
+      "priority": "interaction",
+      "properties": {
+        "x": { "initial": -320, "min": -360, "max": 0, "unit": "px" },
+        "scrim": { "initial": 0, "min": 0, "max": 1 }
+      },
+      "states": { "closed": { "x": -320 }, "open": { "x": 0 } },
+      "initial": "closed",
+      "transition": "$transitions.drawerSpring",
+      "transitions": [
+        { "from": "closed", "to": "open", "on": "toggle" },
+        { "from": "open", "to": "closed", "on": "toggle" },
+        { "from": "*", "to": "closed", "on": "dismiss" }
+      ],
+      "relations": [{ "source": "x", "target": "scrim", "input": [-320, 0], "output": [0, 0.45] }],
+      "gestures": {
+        "drag": { "property": "x", "axis": "x", "bounds": [-320, 0], "rubberBand": 0.55, "snapTo": ["closed", "open"], "flingThreshold": 450 }
+      },
+      "effects": ["glass"]
+    },
+    "toast": {
+      "role": "notification",
+      "properties": { "y": { "initial": 24, "unit": "px" }, "opacity": { "initial": 0, "min": 0, "max": 1 }, "scale": { "initial": 0.96 } },
+      "states": {
+        "hidden": { "y": 24, "opacity": 0, "scale": 0.96 },
+        "shown": { "y": 0, "opacity": 1, "scale": 1 }
+      },
+      "initial": "hidden",
+      "transition": "$transitions.pop",
+      "transitions": [
+        { "to": "shown", "on": "show", "properties": { "opacity": { "type": "tween", "duration": 160, "easing": "easeOut" } } },
+        { "to": "hidden", "on": "hide", "transition": "$transitions.fadeFast", "delay": { "scale": 20 } }
+      ]
+    },
+    "card": {
+      "role": "card",
+      "properties": { "scale": 1, "lift": { "initial": 0, "unit": "px" } },
+      "states": { "rest": { "scale": 1, "lift": 0 }, "hover": { "scale": 1.02, "lift": -4 }, "pressed": { "scale": 0.97, "lift": 0 } },
+      "initial": "rest",
+      "transitions": [
+        { "to": "hover", "on": "enter" },
+        { "to": "rest", "on": "leave" },
+        { "to": "pressed", "on": "press", "transition": "$spring.snappy" },
+        { "to": "hover", "on": "release", "transition": "$spring.bouncy" }
+      ]
+    }
+  },
+  "timelines": {
+    "intro": {
+      "labels": { "content": 200 },
+      "tracks": [
+        { "target": "toast.opacity", "from": 0, "to": 1, "at": 0, "transition": { "type": "tween", "duration": 200 } },
+        { "target": "toast.y", "to": 0, "at": "<", "transition": "$spring.standard" },
+        { "target": "card.scale", "from": 0.9, "to": 1, "at": "content+=50", "transition": { "type": "keyframes", "values": [0.9, 1.04, 1], "duration": 400 } }
+      ]
+    }
+  },
+  "effects": {
+    "glass": { "material": "glass", "intensity": 0.6, "blur": 18, "fallback": "css" }
+  },
+  "performance": { "fidelity": { "min": 1, "max": 4, "initial": 3 }, "budgetFraction": 0.5 },
+  "accessibility": { "reducedMotion": "user", "maxIntensity": 1 }
+}

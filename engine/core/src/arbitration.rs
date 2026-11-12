@@ -24,12 +24,17 @@ pub struct PropertyKey {
 
 impl PropertyKey {
     pub fn new(target: u64, property: impl Into<String>) -> Self {
-        Self { target, property: property.into() }
+        Self {
+            target,
+            property: property.into(),
+        }
     }
 }
 
 /// Priority classes, from least to most important.
-#[derive(Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default)]
+#[derive(
+    Debug, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash, Serialize, Deserialize, Default,
+)]
 #[serde(rename_all = "camelCase")]
 pub enum Priority {
     Decorative = 0,
@@ -54,7 +59,9 @@ pub enum InterruptPolicy {
 #[derive(Debug, Clone, Copy, PartialEq, Eq)]
 pub enum Grant {
     /// The requester now owns the property; `interrupted` is the previous owner, if any.
-    Acquired { interrupted: Option<u64> },
+    Acquired {
+        interrupted: Option<u64>,
+    },
     /// The requester runs as an additive layer on top of the owner.
     Additive,
     /// The requester will be granted ownership when the current owner releases.
@@ -103,7 +110,13 @@ impl Arbiter {
         self.layers.get(key).map_or(&[], Vec::as_slice)
     }
 
-    pub fn request(&mut self, key: &PropertyKey, anim: u64, priority: Priority, policy: InterruptPolicy) -> Grant {
+    pub fn request(
+        &mut self,
+        key: &PropertyKey,
+        anim: u64,
+        priority: Priority,
+        policy: InterruptPolicy,
+    ) -> Grant {
         let current = self.owners.get(key).copied();
         let grant = match (current, policy) {
             (None, InterruptPolicy::Additive) | (None, _) => {
@@ -116,12 +129,17 @@ impl Arbiter {
                 Grant::Additive
             }
             (Some(_), InterruptPolicy::Queue) => {
-                self.queues.entry(key.clone()).or_default().push_back(Owner { anim, priority });
+                self.queues
+                    .entry(key.clone())
+                    .or_default()
+                    .push_back(Owner { anim, priority });
                 Grant::Queued
             }
             (Some(o), InterruptPolicy::Replace) if priority >= o.priority => {
                 self.owners.insert(key.clone(), Owner { anim, priority });
-                Grant::Acquired { interrupted: Some(o.anim) }
+                Grant::Acquired {
+                    interrupted: Some(o.anim),
+                }
             }
             (Some(_), _) => Grant::Rejected,
         };
@@ -172,8 +190,18 @@ impl Arbiter {
             .iter()
             .filter(|(_, o)| o.anim == anim)
             .map(|(k, _)| k.clone())
-            .chain(self.layers.iter().filter(|(_, l)| l.contains(&anim)).map(|(k, _)| k.clone()))
-            .chain(self.queues.iter().filter(|(_, q)| q.iter().any(|o| o.anim == anim)).map(|(k, _)| k.clone()))
+            .chain(
+                self.layers
+                    .iter()
+                    .filter(|(_, l)| l.contains(&anim))
+                    .map(|(k, _)| k.clone()),
+            )
+            .chain(
+                self.queues
+                    .iter()
+                    .filter(|(_, q)| q.iter().any(|o| o.anim == anim))
+                    .map(|(k, _)| k.clone()),
+            )
             .collect();
         let mut promoted = Vec::new();
         for k in keys {
@@ -207,8 +235,16 @@ mod tests {
     #[test]
     fn replace_interrupts_lower_or_equal() {
         let mut a = Arbiter::new();
-        assert_eq!(a.request(&k(), 1, Priority::Normal, InterruptPolicy::Replace), Grant::Acquired { interrupted: None });
-        assert_eq!(a.request(&k(), 2, Priority::Normal, InterruptPolicy::Replace), Grant::Acquired { interrupted: Some(1) });
+        assert_eq!(
+            a.request(&k(), 1, Priority::Normal, InterruptPolicy::Replace),
+            Grant::Acquired { interrupted: None }
+        );
+        assert_eq!(
+            a.request(&k(), 2, Priority::Normal, InterruptPolicy::Replace),
+            Grant::Acquired {
+                interrupted: Some(1)
+            }
+        );
         assert_eq!(a.owner(&k()), Some(2));
         assert_eq!(a.stats().interruptions, 1);
     }
@@ -217,7 +253,10 @@ mod tests {
     fn gesture_cannot_be_stolen_by_decoration() {
         let mut a = Arbiter::new();
         a.request(&k(), 1, Priority::Gesture, InterruptPolicy::Replace);
-        assert_eq!(a.request(&k(), 2, Priority::Decorative, InterruptPolicy::Replace), Grant::Rejected);
+        assert_eq!(
+            a.request(&k(), 2, Priority::Decorative, InterruptPolicy::Replace),
+            Grant::Rejected
+        );
         assert_eq!(a.owner(&k()), Some(1));
     }
 
@@ -225,7 +264,10 @@ mod tests {
     fn queue_promotes_on_release() {
         let mut a = Arbiter::new();
         a.request(&k(), 1, Priority::Normal, InterruptPolicy::Replace);
-        assert_eq!(a.request(&k(), 2, Priority::Normal, InterruptPolicy::Queue), Grant::Queued);
+        assert_eq!(
+            a.request(&k(), 2, Priority::Normal, InterruptPolicy::Queue),
+            Grant::Queued
+        );
         assert_eq!(a.release(&k(), 1), Some(2));
         assert_eq!(a.owner(&k()), Some(2));
         assert_eq!(a.release(&k(), 2), None);
@@ -236,7 +278,10 @@ mod tests {
     fn additive_layers() {
         let mut a = Arbiter::new();
         a.request(&k(), 1, Priority::Normal, InterruptPolicy::Replace);
-        assert_eq!(a.request(&k(), 5, Priority::Decorative, InterruptPolicy::Additive), Grant::Additive);
+        assert_eq!(
+            a.request(&k(), 5, Priority::Decorative, InterruptPolicy::Additive),
+            Grant::Additive
+        );
         assert_eq!(a.layers(&k()), &[5]);
         a.release_all(5);
         assert!(a.layers(&k()).is_empty());

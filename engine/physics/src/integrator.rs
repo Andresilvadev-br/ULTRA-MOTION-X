@@ -55,8 +55,17 @@ impl FixedStepper {
     /// `step` in seconds (e.g. 1/240). `max_steps` caps the work per frame to avoid a
     /// "spiral of death" after long stalls; excess time is dropped and reported.
     pub fn new(step: f64, max_steps: u32) -> Self {
-        let step = if step.is_finite() && step > 0.0 { step } else { 1.0 / 240.0 };
-        Self { step, accumulator: 0.0, max_steps: max_steps.max(1), ticks: 0 }
+        let step = if step.is_finite() && step > 0.0 {
+            step
+        } else {
+            1.0 / 240.0
+        };
+        Self {
+            step,
+            accumulator: 0.0,
+            max_steps: max_steps.max(1),
+            ticks: 0,
+        }
     }
 
     pub fn step(&self) -> f64 {

@@ -93,6 +93,30 @@ dependencies = [
 ]
 
 [[package]]
+name = "umx-bench"
+version = "1.0.0"
+dependencies = [
+ "serde_json",
+ "umx-compiler",
+ "umx-core",
+ "umx-physics",
+ "umx-render",
+ "umx-runtime",
+ "umx-telemetry",
+]
+
+[[package]]
+name = "umx-compiler"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "umx-core",
+ "umx-graph",
+ "umx-physics",
+]
+
+[[package]]
 name = "umx-core"
 version = "1.0.0"
 dependencies = [
@@ -103,11 +127,70 @@ dependencies = [
 ]
 
 [[package]]
+name = "umx-ffi"
+version = "1.0.0"
+dependencies = [
+ "serde_json",
+ "umx-compiler",
+ "umx-core",
+ "umx-physics",
+ "umx-runtime",
+]
+
+[[package]]
+name = "umx-graph"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "umx-core",
+ "umx-physics",
+]
+
+[[package]]
 name = "umx-physics"
 version = "1.0.0"
 dependencies = [
  "libm",
  "serde",
+]
+
+[[package]]
+name = "umx-render"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "umx-scheduler",
+]
+
+[[package]]
+name = "umx-runtime"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
+ "umx-compiler",
+ "umx-core",
+ "umx-graph",
+ "umx-physics",
+ "umx-scheduler",
+ "umx-telemetry",
+]
+
+[[package]]
+name = "umx-scheduler"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "umx-telemetry",
+]
+
+[[package]]
+name = "umx-telemetry"
+version = "1.0.0"
+dependencies = [
+ "serde",
+ "serde_json",
 ]
 
 [[package]]

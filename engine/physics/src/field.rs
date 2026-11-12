@@ -14,15 +14,33 @@ pub const MAX_PARTICLES: usize = 100_000;
 
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Force {
-    Gravity { x: f64, y: f64 },
+    Gravity {
+        x: f64,
+        y: f64,
+    },
     /// Linear velocity dissipation (1/s).
-    Drag { coefficient: f64 },
+    Drag {
+        coefficient: f64,
+    },
     /// Point attractor (`strength` > 0) or repulsor (< 0) with linear falloff.
-    Point { x: f64, y: f64, strength: f64, radius: f64 },
+    Point {
+        x: f64,
+        y: f64,
+        strength: f64,
+        radius: f64,
+    },
     /// Swirl around a point.
-    Vortex { x: f64, y: f64, strength: f64, radius: f64 },
+    Vortex {
+        x: f64,
+        y: f64,
+        strength: f64,
+        radius: f64,
+    },
     /// Deterministic value-noise turbulence.
-    Turbulence { strength: f64, scale: f64 },
+    Turbulence {
+        strength: f64,
+        scale: f64,
+    },
 }
 
 #[derive(Debug, Clone, Copy, PartialEq)]
@@ -85,7 +103,10 @@ pub struct ParticleField {
 impl ParticleField {
     pub fn new(capacity: usize, seed: u64) -> Result<Self, PhysicsError> {
         if capacity > MAX_PARTICLES {
-            return Err(PhysicsError::CapacityExceeded { requested: capacity, limit: MAX_PARTICLES });
+            return Err(PhysicsError::CapacityExceeded {
+                requested: capacity,
+                limit: MAX_PARTICLES,
+            });
         }
         Ok(Self {
             capacity,
@@ -128,7 +149,9 @@ impl ParticleField {
 
     /// Emits `count` particles immediately from emitter `index` (bounded by capacity).
     pub fn burst(&mut self, index: usize, count: usize) -> usize {
-        let Some(e) = self.emitters.get(index).copied() else { return 0 };
+        let Some(e) = self.emitters.get(index).copied() else {
+            return 0;
+        };
         let mut n = 0;
         for _ in 0..count {
             if !self.spawn(&e) {
@@ -204,7 +227,12 @@ impl ParticleField {
                         ax -= coefficient * f64::from(self.vx[i]);
                         ay -= coefficient * f64::from(self.vy[i]);
                     }
-                    Force::Point { x, y, strength, radius } => {
+                    Force::Point {
+                        x,
+                        y,
+                        strength,
+                        radius,
+                    } => {
                         let (dx, dy) = (x - px, y - py);
                         let d = math::hypot(dx, dy);
                         if d > 1e-6 && d < radius {
@@ -213,7 +241,12 @@ impl ParticleField {
                             ay += s * dy / d;
                         }
                     }
-                    Force::Vortex { x, y, strength, radius } => {
+                    Force::Vortex {
+                        x,
+                        y,
+                        strength,
+                        radius,
+                    } => {
                         let (dx, dy) = (px - x, py - y);
                         let d = math::hypot(dx, dy);
                         if d > 1e-6 && d < radius {
@@ -270,7 +303,8 @@ impl ParticleField {
 /// Smooth deterministic 2D value noise in [-1, 1].
 pub fn value_noise(x: f64, y: f64, seed: f64) -> f64 {
     let hash = |ix: i64, iy: i64| -> f64 {
-        let mut h = (ix as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15) ^ (iy as u64).wrapping_mul(0xC2B2_AE3D_27D4_EB4F);
+        let mut h = (ix as u64).wrapping_mul(0x9E37_79B9_7F4A_7C15)
+            ^ (iy as u64).wrapping_mul(0xC2B2_AE3D_27D4_EB4F);
         h ^= (seed.to_bits()).wrapping_mul(0x1656_67B1_9E37_79F9);
         h ^= h >> 31;
         h = h.wrapping_mul(0xBF58_476D_1CE4_E5B9);
@@ -293,7 +327,14 @@ mod tests {
     #[test]
     fn capacity_is_respected() {
         let mut f = ParticleField::new(100, 1).unwrap();
-        let e = f.add_emitter(Emitter { rate: 100_000.0, life_min: 10.0, life_max: 10.0, ..Emitter::default() }).unwrap();
+        let e = f
+            .add_emitter(Emitter {
+                rate: 100_000.0,
+                life_min: 10.0,
+                life_max: 10.0,
+                ..Emitter::default()
+            })
+            .unwrap();
         for _ in 0..60 {
             f.advance(1.0 / 60.0);
         }
@@ -305,7 +346,12 @@ mod tests {
     #[test]
     fn becomes_idle_after_emitters_stop() {
         let mut f = ParticleField::new(500, 3).unwrap();
-        let e = f.add_emitter(Emitter { rate: 0.0, ..Emitter::default() }).unwrap();
+        let e = f
+            .add_emitter(Emitter {
+                rate: 0.0,
+                ..Emitter::default()
+            })
+            .unwrap();
         f.burst(e, 50);
         assert!(!f.is_idle());
         for _ in 0..200 {
@@ -319,7 +365,13 @@ mod tests {
         let run = |fid: f64| {
             let mut f = ParticleField::new(10_000, 9).unwrap();
             f.fidelity = fid;
-            f.add_emitter(Emitter { rate: 1000.0, life_min: 5.0, life_max: 5.0, ..Emitter::default() }).unwrap();
+            f.add_emitter(Emitter {
+                rate: 1000.0,
+                life_min: 5.0,
+                life_max: 5.0,
+                ..Emitter::default()
+            })
+            .unwrap();
             for _ in 0..60 {
                 f.advance(1.0 / 60.0);
             }
@@ -327,7 +379,10 @@ mod tests {
         };
         let full = run(1.0);
         let half = run(0.5);
-        assert!((half as f64 - full as f64 * 0.5).abs() < 5.0, "{full} {half}");
+        assert!(
+            (half as f64 - full as f64 * 0.5).abs() < 5.0,
+            "{full} {half}"
+        );
     }
 
     #[test]
@@ -335,7 +390,10 @@ mod tests {
         let run = || {
             let mut f = ParticleField::new(1000, 77).unwrap();
             f.forces.push(Force::Gravity { x: 0.0, y: 200.0 });
-            f.forces.push(Force::Turbulence { strength: 50.0, scale: 40.0 });
+            f.forces.push(Force::Turbulence {
+                strength: 50.0,
+                scale: 40.0,
+            });
             f.add_emitter(Emitter::default()).unwrap();
             for _ in 0..120 {
                 f.advance(1.0 / 60.0);

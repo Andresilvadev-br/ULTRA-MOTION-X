@@ -19,8 +19,15 @@ pub enum PhysicsError {
 impl fmt::Display for PhysicsError {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         match self {
-            PhysicsError::NotFinite(name) => write!(f, "parameter `{name}` must be a finite number"),
-            PhysicsError::OutOfRange { name, value, min, max } => {
+            PhysicsError::NotFinite(name) => {
+                write!(f, "parameter `{name}` must be a finite number")
+            }
+            PhysicsError::OutOfRange {
+                name,
+                value,
+                min,
+                max,
+            } => {
                 write!(f, "parameter `{name}` = {value} is outside [{min}, {max}]")
             }
             PhysicsError::CapacityExceeded { requested, limit } => {
@@ -40,10 +47,20 @@ pub(crate) fn check_finite(name: &'static str, v: f64) -> Result<f64, PhysicsErr
     }
 }
 
-pub(crate) fn check_range(name: &'static str, v: f64, min: f64, max: f64) -> Result<f64, PhysicsError> {
+pub(crate) fn check_range(
+    name: &'static str,
+    v: f64,
+    min: f64,
+    max: f64,
+) -> Result<f64, PhysicsError> {
     check_finite(name, v)?;
     if v < min || v > max {
-        Err(PhysicsError::OutOfRange { name, value: v, min, max })
+        Err(PhysicsError::OutOfRange {
+            name,
+            value: v,
+            min,
+            max,
+        })
     } else {
         Ok(v)
     }

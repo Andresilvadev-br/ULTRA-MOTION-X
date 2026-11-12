@@ -17,8 +17,16 @@ pub struct Keyframes {
 }
 
 impl Keyframes {
-    pub fn new(values: Vec<f64>, offsets: Vec<f64>, easings: Vec<Easing>) -> Result<Self, CoreError> {
-        let k = Self { values, offsets, easings };
+    pub fn new(
+        values: Vec<f64>,
+        offsets: Vec<f64>,
+        easings: Vec<Easing>,
+    ) -> Result<Self, CoreError> {
+        let k = Self {
+            values,
+            offsets,
+            easings,
+        };
         k.validate()?;
         Ok(k.normalized())
     }
@@ -26,34 +34,56 @@ impl Keyframes {
     fn normalized(mut self) -> Self {
         if self.offsets.is_empty() {
             let n = self.values.len();
-            self.offsets = (0..n).map(|i| if n == 1 { 1.0 } else { i as f64 / (n - 1) as f64 }).collect();
+            self.offsets = (0..n)
+                .map(|i| {
+                    if n == 1 {
+                        1.0
+                    } else {
+                        i as f64 / (n - 1) as f64
+                    }
+                })
+                .collect();
         }
         self
     }
 
     pub fn validate(&self) -> Result<(), CoreError> {
         if self.values.is_empty() {
-            return Err(CoreError::InvalidKeyframes("at least one value is required".into()));
+            return Err(CoreError::InvalidKeyframes(
+                "at least one value is required".into(),
+            ));
         }
         // The first value may be NaN, meaning "start from the current value".
-        if self.values.iter().enumerate().any(|(i, v)| !(v.is_finite() || (i == 0 && v.is_nan()))) {
+        if self
+            .values
+            .iter()
+            .enumerate()
+            .any(|(i, v)| !(v.is_finite() || (i == 0 && v.is_nan())))
+        {
             return Err(CoreError::InvalidKeyframes("values must be finite".into()));
         }
         if !self.offsets.is_empty() {
             if self.offsets.len() != self.values.len() {
-                return Err(CoreError::InvalidKeyframes("offsets must match values length".into()));
+                return Err(CoreError::InvalidKeyframes(
+                    "offsets must match values length".into(),
+                ));
             }
             let mut last = 0.0;
             for &o in &self.offsets {
                 if !(0.0..=1.0).contains(&o) || o < last {
-                    return Err(CoreError::InvalidKeyframes("offsets must be non-decreasing within [0, 1]".into()));
+                    return Err(CoreError::InvalidKeyframes(
+                        "offsets must be non-decreasing within [0, 1]".into(),
+                    ));
                 }
                 last = o;
             }
         }
         let segs = self.values.len().saturating_sub(1);
         if self.easings.len() > 1 && self.easings.len() != segs {
-            return Err(CoreError::InvalidKeyframes(format!("expected 1 or {segs} easings, got {}", self.easings.len())));
+            return Err(CoreError::InvalidKeyframes(format!(
+                "expected 1 or {segs} easings, got {}",
+                self.easings.len()
+            )));
         }
         for e in &self.easings {
             e.validate()?;
@@ -121,6 +151,11 @@ mod tests {
     fn validation() {
         assert!(Keyframes::new(vec![], vec![], vec![]).is_err());
         assert!(Keyframes::new(vec![0.0, 1.0], vec![0.5, 0.2], vec![]).is_err());
-        assert!(Keyframes::new(vec![0.0, 1.0, 2.0], vec![], vec![Easing::Linear, Easing::Linear, Easing::Linear]).is_err());
+        assert!(Keyframes::new(
+            vec![0.0, 1.0, 2.0],
+            vec![],
+            vec![Easing::Linear, Easing::Linear, Easing::Linear]
+        )
+        .is_err());
     }
 }

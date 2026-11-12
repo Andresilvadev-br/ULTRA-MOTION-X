@@ -31,7 +31,11 @@ impl Playback {
     pub fn new(duration: f64) -> Self {
         Self {
             time: 0.0,
-            duration: if duration.is_finite() { duration.max(0.0) } else { 0.0 },
+            duration: if duration.is_finite() {
+                duration.max(0.0)
+            } else {
+                0.0
+            },
             rate: 1.0,
             iterations: 1.0,
             alternate: false,
@@ -98,7 +102,11 @@ impl Playback {
     pub fn seek(&mut self, t: f64) {
         if t.is_finite() {
             let total = self.total();
-            self.time = if total.is_finite() { t.clamp(0.0, total) } else { t.max(0.0) };
+            self.time = if total.is_finite() {
+                t.clamp(0.0, total)
+            } else {
+                t.max(0.0)
+            };
         }
     }
 
@@ -115,8 +123,16 @@ impl Playback {
         if total.is_finite() && self.time >= total {
             let last = (libm::ceil(self.iterations) as u64).saturating_sub(1);
             let frac = self.iterations - libm::floor(self.iterations);
-            let end = if frac > 0.0 { frac * self.duration } else { self.duration };
-            return if self.alternate && last % 2 == 1 { self.duration - end } else { end };
+            let end = if frac > 0.0 {
+                frac * self.duration
+            } else {
+                self.duration
+            };
+            return if self.alternate && last % 2 == 1 {
+                self.duration - end
+            } else {
+                end
+            };
         }
         let iter = libm::floor(self.time / self.duration) as u64;
         let t = self.time - iter as f64 * self.duration;
@@ -131,7 +147,8 @@ impl Playback {
         if self.duration == 0.0 {
             return 0;
         }
-        (libm::floor(self.time / self.duration) as u32).min(libm::ceil(self.iterations).max(1.0) as u32 - 1)
+        (libm::floor(self.time / self.duration) as u32)
+            .min(libm::ceil(self.iterations).max(1.0) as u32 - 1)
     }
 
     /// Advances by wall-clock `dt` seconds.

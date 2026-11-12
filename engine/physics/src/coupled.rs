@@ -30,9 +30,16 @@ pub struct CoupledSystem {
 }
 
 impl CoupledSystem {
-    pub fn new(count: usize, anchor_stiffness: f64, anchor_damping: f64) -> Result<Self, PhysicsError> {
+    pub fn new(
+        count: usize,
+        anchor_stiffness: f64,
+        anchor_damping: f64,
+    ) -> Result<Self, PhysicsError> {
         if count > MAX_NODES {
-            return Err(PhysicsError::CapacityExceeded { requested: count, limit: MAX_NODES });
+            return Err(PhysicsError::CapacityExceeded {
+                requested: count,
+                limit: MAX_NODES,
+            });
         }
         check_range("anchor_stiffness", anchor_stiffness, 0.0, 1e7)?;
         check_range("anchor_damping", anchor_damping, 0.0, 1e7)?;
@@ -52,7 +59,13 @@ impl CoupledSystem {
     pub fn chain(count: usize, stiffness: f64, damping: f64) -> Result<Self, PhysicsError> {
         let mut s = Self::new(count, stiffness, damping)?;
         for i in 1..count {
-            s.link(Link { a: i - 1, b: i, stiffness, damping, rest_length: 0.0 })?;
+            s.link(Link {
+                a: i - 1,
+                b: i,
+                stiffness,
+                damping,
+                rest_length: 0.0,
+            })?;
         }
         Ok(s)
     }
@@ -108,7 +121,7 @@ impl CoupledSystem {
         &self.velocities
     }
 
-    fn derivative(&self, y: &Vec<f64>) -> Vec<f64> {
+    fn derivative(&self, y: &[f64]) -> Vec<f64> {
         let n = self.len();
         let mut d = vec![0.0; 2 * n];
         let mut force = vec![0.0; n];
@@ -174,7 +187,11 @@ impl CoupledSystem {
 
     pub fn is_at_rest(&self, delta: f64, speed: f64) -> bool {
         self.velocities.iter().all(|v| v.abs() < speed)
-            && self.targets.iter().zip(&self.positions).all(|(t, x)| t.map_or(true, |t| (x - t).abs() < delta))
+            && self
+                .targets
+                .iter()
+                .zip(&self.positions)
+                .all(|(t, x)| t.map_or(true, |t| (x - t).abs() < delta))
     }
 }
 

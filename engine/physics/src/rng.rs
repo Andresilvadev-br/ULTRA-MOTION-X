@@ -8,7 +8,10 @@ pub struct Pcg32 {
 
 impl Pcg32 {
     pub fn new(seed: u64) -> Self {
-        let mut rng = Self { state: 0, inc: (0xda3e_39cb_94b9_5bdb_u64 << 1) | 1 };
+        let mut rng = Self {
+            state: 0,
+            inc: (0xda3e_39cb_94b9_5bdb_u64 << 1) | 1,
+        };
         rng.next_u32();
         rng.state = rng.state.wrapping_add(seed);
         rng.next_u32();
@@ -17,7 +20,9 @@ impl Pcg32 {
 
     pub fn next_u32(&mut self) -> u32 {
         let old = self.state;
-        self.state = old.wrapping_mul(6_364_136_223_846_793_005).wrapping_add(self.inc);
+        self.state = old
+            .wrapping_mul(6_364_136_223_846_793_005)
+            .wrapping_add(self.inc);
         let xorshifted = (((old >> 18) ^ old) >> 27) as u32;
         let rot = (old >> 59) as u32;
         xorshifted.rotate_right(rot)

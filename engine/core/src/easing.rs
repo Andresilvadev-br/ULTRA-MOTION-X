@@ -9,11 +9,21 @@ use serde::{Deserialize, Serialize};
 pub enum Easing {
     Linear,
     /// CSS-compatible cubic Bézier with control points `(x1, y1)`, `(x2, y2)`; x ∈ [0, 1].
-    CubicBezier { x1: f64, y1: f64, x2: f64, y2: f64 },
+    CubicBezier {
+        x1: f64,
+        y1: f64,
+        x2: f64,
+        y2: f64,
+    },
     /// CSS `steps(n, jump-end | jump-start)`.
-    Steps { count: u32, jump_start: bool },
+    Steps {
+        count: u32,
+        jump_start: bool,
+    },
     /// CSS `linear()` style piecewise-linear curve with evenly spaced points.
-    Points { values: Vec<f64> },
+    Points {
+        values: Vec<f64>,
+    },
 }
 
 impl Default for Easing {
@@ -29,7 +39,12 @@ impl Easing {
         Ok(e)
     }
     pub fn standard() -> Self {
-        Easing::CubicBezier { x1: 0.2, y1: 0.0, x2: 0.0, y2: 1.0 }
+        Easing::CubicBezier {
+            x1: 0.2,
+            y1: 0.0,
+            x2: 0.0,
+            y2: 1.0,
+        }
     }
 
     /// Resolves CSS / platform names.
@@ -48,8 +63,18 @@ impl Easing {
             "backIn" => (0.36, 0.0, 0.66, -0.56),
             "circOut" => (0.0, 0.55, 0.45, 1.0),
             "expoOut" => (0.16, 1.0, 0.3, 1.0),
-            "stepEnd" | "step-end" => return Some(Easing::Steps { count: 1, jump_start: false }),
-            "stepStart" | "step-start" => return Some(Easing::Steps { count: 1, jump_start: true }),
+            "stepEnd" | "step-end" => {
+                return Some(Easing::Steps {
+                    count: 1,
+                    jump_start: false,
+                })
+            }
+            "stepStart" | "step-start" => {
+                return Some(Easing::Steps {
+                    count: 1,
+                    jump_start: true,
+                })
+            }
             _ => return None,
         };
         Some(Easing::CubicBezier { x1, y1, x2, y2 })
@@ -60,10 +85,14 @@ impl Easing {
             Easing::Linear => Ok(()),
             Easing::CubicBezier { x1, y1, x2, y2 } => {
                 if ![x1, y1, x2, y2].iter().all(|v| v.is_finite()) {
-                    return Err(CoreError::InvalidEasing("bezier control points must be finite".into()));
+                    return Err(CoreError::InvalidEasing(
+                        "bezier control points must be finite".into(),
+                    ));
                 }
                 if !(0.0..=1.0).contains(x1) || !(0.0..=1.0).contains(x2) {
-                    return Err(CoreError::InvalidEasing("bezier x1/x2 must be within [0, 1]".into()));
+                    return Err(CoreError::InvalidEasing(
+                        "bezier x1/x2 must be within [0, 1]".into(),
+                    ));
                 }
                 Ok(())
             }
@@ -76,7 +105,9 @@ impl Easing {
             }
             Easing::Points { values } => {
                 if values.len() < 2 || values.iter().any(|v| !v.is_finite()) {
-                    Err(CoreError::InvalidEasing("linear() needs ≥ 2 finite points".into()))
+                    Err(CoreError::InvalidEasing(
+                        "linear() needs ≥ 2 finite points".into(),
+                    ))
                 } else {
                     Ok(())
                 }
@@ -144,12 +175,24 @@ impl Easing {
     pub fn to_css(&self) -> String {
         match self {
             Easing::Linear => "linear".into(),
-            Easing::CubicBezier { x1, y1, x2, y2 } => format!("cubic-bezier({x1}, {y1}, {x2}, {y2})"),
+            Easing::CubicBezier { x1, y1, x2, y2 } => {
+                format!("cubic-bezier({x1}, {y1}, {x2}, {y2})")
+            }
             Easing::Steps { count, jump_start } => {
-                format!("steps({count}, {})", if *jump_start { "jump-start" } else { "jump-end" })
+                format!(
+                    "steps({count}, {})",
+                    if *jump_start {
+                        "jump-start"
+                    } else {
+                        "jump-end"
+                    }
+                )
             }
             Easing::Points { values } => {
-                let parts: Vec<String> = values.iter().map(|v| format!("{}", (v * 10000.0).round() / 10000.0)).collect();
+                let parts: Vec<String> = values
+                    .iter()
+                    .map(|v| format!("{}", (v * 10000.0).round() / 10000.0))
+                    .collect();
                 format!("linear({})", parts.join(", "))
             }
         }
@@ -206,7 +249,15 @@ mod tests {
 
     #[test]
     fn endpoints() {
-        for name in ["linear", "ease", "easeIn", "easeOut", "easeInOut", "standard", "backOut"] {
+        for name in [
+            "linear",
+            "ease",
+            "easeIn",
+            "easeOut",
+            "easeInOut",
+            "standard",
+            "backOut",
+        ] {
             let e = Easing::named(name).unwrap();
             assert_eq!(e.apply(0.0), 0.0, "{name}");
             assert_eq!(e.apply(1.0), 1.0, "{name}");
@@ -241,9 +292,14 @@ mod tests {
 
     #[test]
     fn steps_and_points() {
-        let s = Easing::Steps { count: 4, jump_start: false };
+        let s = Easing::Steps {
+            count: 4,
+            jump_start: false,
+        };
         assert_eq!(s.apply(0.3), 0.25);
-        let l = Easing::Points { values: vec![0.0, 1.2, 1.0] };
+        let l = Easing::Points {
+            values: vec![0.0, 1.2, 1.0],
+        };
         assert!((l.apply(0.5) - 1.2).abs() < 1e-12);
         assert!(l.to_css().starts_with("linear("));
     }
@@ -251,7 +307,12 @@ mod tests {
     #[test]
     fn rejects_invalid() {
         assert!(Easing::cubic(1.5, 0.0, 0.5, 1.0).is_err());
-        assert!(Easing::Steps { count: 0, jump_start: false }.validate().is_err());
+        assert!(Easing::Steps {
+            count: 0,
+            jump_start: false
+        }
+        .validate()
+        .is_err());
     }
 
     #[test]

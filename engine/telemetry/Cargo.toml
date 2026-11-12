@@ -1,0 +1,16 @@
+[package]
+name = "umx-telemetry"
+description = "Ultra Motion X Frame Intelligence Telemetry: frame statistics, percentiles, counters and regression comparison."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

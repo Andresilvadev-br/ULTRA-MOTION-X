@@ -1,0 +1,18 @@
+[package]
+name = "umx-graph"
+description = "Ultra Motion X Universal Motion Graph: states, transitions, events, guards, relations and incremental retargeting."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+umx-core.workspace = true
+umx-physics.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+
+[lints]
+workspace = true

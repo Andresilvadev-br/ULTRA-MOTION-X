@@ -18,7 +18,11 @@ pub struct VelocityTracker {
 
 impl Default for VelocityTracker {
     fn default() -> Self {
-        Self { samples: [(0.0, 0.0); 20], len: 0, head: 0 }
+        Self {
+            samples: [(0.0, 0.0); 20],
+            len: 0,
+            head: 0,
+        }
     }
 }
 
@@ -164,7 +168,11 @@ pub struct IntentThresholds {
 
 impl Default for IntentThresholds {
     fn default() -> Self {
-        Self { drag_distance: 6.0, long_press: 0.5, swipe_speed: 500.0 }
+        Self {
+            drag_distance: 6.0,
+            long_press: 0.5,
+            swipe_speed: 500.0,
+        }
     }
 }
 
@@ -179,7 +187,13 @@ pub enum Intent {
 }
 
 /// Classifies a finished pointer sequence.
-pub fn classify(distance: f64, duration: f64, release_speed: f64, cancelled: bool, th: &IntentThresholds) -> Intent {
+pub fn classify(
+    distance: f64,
+    duration: f64,
+    release_speed: f64,
+    cancelled: bool,
+    th: &IntentThresholds,
+) -> Intent {
     if cancelled {
         Intent::Cancel
     } else if distance < th.drag_distance {

@@ -54,7 +54,12 @@ impl Default for SpringParams {
 impl SpringParams {
     /// Creates validated parameters from physical constants.
     pub fn new(stiffness: f64, damping: f64, mass: f64) -> Result<Self, PhysicsError> {
-        let p = Self { stiffness, damping, mass, ..Self::default() };
+        let p = Self {
+            stiffness,
+            damping,
+            mass,
+            ..Self::default()
+        };
         p.validate()?;
         Ok(p)
     }
@@ -75,7 +80,11 @@ impl SpringParams {
     /// in `[-1, 1]` controls overshoot (0 = critically damped, > 0 bouncy, < 0 overdamped).
     pub fn from_duration_bounce(duration: f64, bounce: f64) -> Result<Self, PhysicsError> {
         check_range("bounce", bounce, -1.0, 1.0)?;
-        let ratio = if bounce >= 0.0 { 1.0 - bounce } else { 1.0 / (1.0 + bounce).max(1e-3) };
+        let ratio = if bounce >= 0.0 {
+            1.0 - bounce
+        } else {
+            1.0 / (1.0 + bounce).max(1e-3)
+        };
         Self::from_response(duration, ratio)
     }
 
@@ -153,7 +162,12 @@ pub struct SpringState {
 
 impl Spring {
     /// Builds a spring. `initial_velocity` is in units per second.
-    pub fn new(params: SpringParams, from: f64, to: f64, initial_velocity: f64) -> Result<Self, PhysicsError> {
+    pub fn new(
+        params: SpringParams,
+        from: f64,
+        to: f64,
+        initial_velocity: f64,
+    ) -> Result<Self, PhysicsError> {
         params.validate()?;
         check_finite("from", from)?;
         check_finite("to", to)?;
@@ -166,18 +180,39 @@ impl Spring {
             Regime::Underdamped => {
                 let alpha = zeta * w0;
                 let wd = w0 * math::sqrt(1.0 - zeta * zeta);
-                Solution::Under { alpha, wd, a: x0, b: (v0 + alpha * x0) / wd }
+                Solution::Under {
+                    alpha,
+                    wd,
+                    a: x0,
+                    b: (v0 + alpha * x0) / wd,
+                }
             }
-            Regime::Critical => Solution::Critical { w: w0, a: x0, b: v0 + w0 * x0 },
+            Regime::Critical => Solution::Critical {
+                w: w0,
+                a: x0,
+                b: v0 + w0 * x0,
+            },
             Regime::Overdamped => {
                 let s = math::sqrt(zeta * zeta - 1.0);
                 let r1 = -w0 * (zeta - s);
                 let r2 = -w0 * (zeta + s);
                 let c1 = (v0 - r2 * x0) / (r1 - r2);
-                Solution::Over { r1, r2, c1, c2: x0 - c1 }
+                Solution::Over {
+                    r1,
+                    r2,
+                    c1,
+                    c2: x0 - c1,
+                }
             }
         };
-        let mut spring = Self { params, from, to, initial_velocity, solution, finish_time: f64::INFINITY };
+        let mut spring = Self {
+            params,
+            from,
+            to,
+            initial_velocity,
+            solution,
+            finish_time: f64::INFINITY,
+        };
         spring.finish_time = spring.compute_finish_time();
         Ok(spring)
     }
@@ -226,12 +261,24 @@ impl Spring {
 
     /// Samples the spring at elapsed time `t` (seconds, clamped to ≥ 0).
     pub fn sample(&self, t: f64) -> SpringState {
-        let t = if t.is_finite() { t.max(0.0) } else { f64::INFINITY };
+        let t = if t.is_finite() {
+            t.max(0.0)
+        } else {
+            f64::INFINITY
+        };
         if t >= self.finish_time {
-            return SpringState { position: self.to, velocity: 0.0, done: true };
+            return SpringState {
+                position: self.to,
+                velocity: 0.0,
+                done: true,
+            };
         }
         let (x, v) = self.displacement(t);
-        SpringState { position: self.to + x, velocity: v, done: false }
+        SpringState {
+            position: self.to + x,
+            velocity: v,
+            done: false,
+        }
     }
 
     /// Returns a new spring heading to `new_target` that starts exactly at this spring's state
@@ -242,7 +289,12 @@ impl Spring {
     }
 
     /// Same as [`retarget`](Self::retarget) but also swaps the physical parameters.
-    pub fn retarget_with(&self, t: f64, new_target: f64, params: SpringParams) -> Result<Spring, PhysicsError> {
+    pub fn retarget_with(
+        &self,
+        t: f64,
+        new_target: f64,
+        params: SpringParams,
+    ) -> Result<Spring, PhysicsError> {
         let s = self.sample(t);
         Spring::new(params, s.position, new_target, s.velocity)
     }
@@ -327,22 +379,39 @@ impl Spring {
                 }
                 let r = math::hypot(a, b);
                 let w0 = math::hypot(wd, alpha);
-                let tx = if r > delta { math::ln(r / delta) / alpha } else { 0.0 };
-                let tv = if r * w0 > speed { math::ln(r * w0 / speed) / alpha } else { 0.0 };
+                let tx = if r > delta {
+                    math::ln(r / delta) / alpha
+                } else {
+                    0.0
+                };
+                let tv = if r * w0 > speed {
+                    math::ln(r * w0 / speed) / alpha
+                } else {
+                    0.0
+                };
                 tx.max(tv)
             }
             Solution::Over { r1, r2, c1, c2 } => {
                 let bx = c1.abs() + c2.abs();
                 let bv = (c1 * r1).abs() + (c2 * r2).abs();
                 // r1 is the slow root (closest to zero, negative).
-                let tx = if bx > delta { math::ln(bx / delta) / -r1 } else { 0.0 };
-                let tv = if bv > speed { math::ln(bv / speed) / -r1 } else { 0.0 };
+                let tx = if bx > delta {
+                    math::ln(bx / delta) / -r1
+                } else {
+                    0.0
+                };
+                let tv = if bv > speed {
+                    math::ln(bv / speed) / -r1
+                } else {
+                    0.0
+                };
                 tx.max(tv)
             }
             Solution::Critical { w, a, b } => {
                 // Bounds: |x| ≤ (|a| + |b| t) e^{-wt}, |v| ≤ (|b| + w|a| + w|b| t) e^{-wt}.
                 let fx = |t: f64| (a.abs() + b.abs() * t) * math::exp(-w * t) - delta;
-                let fv = |t: f64| (b.abs() + w * a.abs() + w * b.abs() * t) * math::exp(-w * t) - speed;
+                let fv =
+                    |t: f64| (b.abs() + w * a.abs() + w * b.abs() * t) * math::exp(-w * t) - speed;
                 let f = |t: f64| fx(t).max(fv(t));
                 // Both bounds are decreasing after t ≥ 1/w; search from there.
                 let lo0 = 0.0;
@@ -374,7 +443,11 @@ impl Spring {
     /// progress (0 = from, 1 = to). Used to bake springs into CSS `linear()` easings.
     pub fn bake_progress(&self, count: usize) -> Vec<f64> {
         let span = self.to - self.from;
-        let end = if self.finish_time.is_finite() { self.finish_time } else { 10.0 };
+        let end = if self.finish_time.is_finite() {
+            self.finish_time
+        } else {
+            10.0
+        };
         let n = count.max(1);
         (0..=n)
             .map(|i| {
@@ -403,8 +476,14 @@ mod tests {
         let steps = (t_end / dt).round() as usize;
         for _ in 0..steps {
             let (k1x, k1v) = (v, acc(x, v));
-            let (k2x, k2v) = (v + 0.5 * dt * k1v, acc(x + 0.5 * dt * k1x, v + 0.5 * dt * k1v));
-            let (k3x, k3v) = (v + 0.5 * dt * k2v, acc(x + 0.5 * dt * k2x, v + 0.5 * dt * k2v));
+            let (k2x, k2v) = (
+                v + 0.5 * dt * k1v,
+                acc(x + 0.5 * dt * k1x, v + 0.5 * dt * k1v),
+            );
+            let (k3x, k3v) = (
+                v + 0.5 * dt * k2v,
+                acc(x + 0.5 * dt * k2x, v + 0.5 * dt * k2v),
+            );
             let (k4x, k4v) = (v + dt * k3v, acc(x + dt * k3x, v + dt * k3v));
             x += dt / 6.0 * (k1x + 2.0 * k2x + 2.0 * k3x + k4x);
             v += dt / 6.0 * (k1v + 2.0 * k2v + 2.0 * k3v + k4v);
@@ -485,7 +564,10 @@ mod tests {
 
     #[test]
     fn clamp_overshoot_stops_at_target() {
-        let p = SpringParams { clamp_overshoot: true, ..SpringParams::new(300.0, 5.0, 1.0).unwrap() };
+        let p = SpringParams {
+            clamp_overshoot: true,
+            ..SpringParams::new(300.0, 5.0, 1.0).unwrap()
+        };
         let s = Spring::new(p, 0.0, 10.0, 0.0).unwrap();
         let mut t = 0.0;
         while t < 2.0 {
@@ -512,7 +594,13 @@ mod tests {
         for t in s.crossing_times(5) {
             assert!(s.displacement(t).0.abs() < 1e-9, "t={t}");
         }
-        let over = Spring::new(SpringParams::new(100.0, 60.0, 1.0).unwrap(), 0.0, 5.0, 400.0).unwrap();
+        let over = Spring::new(
+            SpringParams::new(100.0, 60.0, 1.0).unwrap(),
+            0.0,
+            5.0,
+            400.0,
+        )
+        .unwrap();
         for t in over.crossing_times(1) {
             assert!(over.displacement(t).0.abs() < 1e-9);
         }

@@ -24,7 +24,16 @@ pub struct Body {
 
 impl Body {
     pub fn new(x: f64, y: f64, radius: f64) -> Self {
-        Self { x, y, vx: 0.0, vy: 0.0, mass: 1.0, radius, fixed: false, anchor: None }
+        Self {
+            x,
+            y,
+            vx: 0.0,
+            vy: 0.0,
+            mass: 1.0,
+            radius,
+            fixed: false,
+            anchor: None,
+        }
     }
 }
 
@@ -75,7 +84,10 @@ impl World {
 
     pub fn add(&mut self, body: Body) -> Result<usize, PhysicsError> {
         if self.bodies.len() >= MAX_BODIES {
-            return Err(PhysicsError::CapacityExceeded { requested: self.bodies.len() + 1, limit: MAX_BODIES });
+            return Err(PhysicsError::CapacityExceeded {
+                requested: self.bodies.len() + 1,
+                limit: MAX_BODIES,
+            });
         }
         check_finite("x", body.x)?;
         check_finite("y", body.y)?;
@@ -167,7 +179,11 @@ impl World {
                 if dist >= min || min == 0.0 {
                     continue;
                 }
-                let (nx, ny) = if dist > 1e-12 { (dx / dist, dy / dist) } else { (1.0, 0.0) };
+                let (nx, ny) = if dist > 1e-12 {
+                    (dx / dist, dy / dist)
+                } else {
+                    (1.0, 0.0)
+                };
                 let inv_a = if a.fixed { 0.0 } else { 1.0 / a.mass };
                 let inv_b = if b.fixed { 0.0 } else { 1.0 / b.mass };
                 let inv_sum = inv_a + inv_b;
@@ -176,7 +192,11 @@ impl World {
                 let (ca, cb) = (pen * inv_a / inv_sum, pen * inv_b / inv_sum);
                 // Impulse along the normal.
                 let rel = (b.vx - a.vx) * nx + (b.vy - a.vy) * ny;
-                let j_imp = if rel < 0.0 { -(1.0 + self.restitution) * rel / inv_sum } else { 0.0 };
+                let j_imp = if rel < 0.0 {
+                    -(1.0 + self.restitution) * rel / inv_sum
+                } else {
+                    0.0
+                };
                 let ba = &mut self.bodies[i];
                 ba.x -= nx * ca;
                 ba.y -= ny * ca;
@@ -214,7 +234,13 @@ mod tests {
     fn scene() -> World {
         let mut w = World::new(1.0 / 240.0);
         w.gravity = (0.0, 900.0);
-        w.bounds = Some(Bounds { min_x: 0.0, min_y: 0.0, max_x: 400.0, max_y: 300.0, restitution: 0.6 });
+        w.bounds = Some(Bounds {
+            min_x: 0.0,
+            min_y: 0.0,
+            max_x: 400.0,
+            max_y: 300.0,
+            restitution: 0.6,
+        });
         for i in 0..20 {
             let mut b = Body::new(20.0 + (i as f64) * 18.0, 10.0 + (i % 3) as f64 * 15.0, 8.0);
             b.vx = (i as f64 - 10.0) * 12.0;

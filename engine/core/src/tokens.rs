@@ -21,7 +21,10 @@ pub struct SpringToken {
 
 impl SpringToken {
     pub fn params(&self) -> Result<SpringParams, CoreError> {
-        Ok(SpringParams::from_response(self.response, self.damping_ratio)?)
+        Ok(SpringParams::from_response(
+            self.response,
+            self.damping_ratio,
+        )?)
     }
 }
 
@@ -137,17 +140,21 @@ impl Profiles {
     /// Loads the embedded built-in profiles.
     pub fn builtin() -> Self {
         // The embedded JSON is validated by tests; failure here is a build defect.
-        Self::from_json(BUILTIN).unwrap_or_else(|e| panic!("embedded profiles.json is invalid: {e}"))
+        Self::from_json(BUILTIN)
+            .unwrap_or_else(|e| panic!("embedded profiles.json is invalid: {e}"))
     }
 
     pub fn from_json(json: &str) -> Result<Self, CoreError> {
-        let p: Profiles = serde_json::from_str(json).map_err(|e| CoreError::Token(e.to_string()))?;
+        let p: Profiles =
+            serde_json::from_str(json).map_err(|e| CoreError::Token(e.to_string()))?;
         p.validate()?;
         Ok(p)
     }
 
     pub fn get(&self, name: &str) -> Result<&MotionProfile, CoreError> {
-        self.profiles.get(name).ok_or_else(|| CoreError::UnknownProfile(name.to_string()))
+        self.profiles
+            .get(name)
+            .ok_or_else(|| CoreError::UnknownProfile(name.to_string()))
     }
 
     pub fn validate(&self) -> Result<(), CoreError> {
@@ -155,7 +162,8 @@ impl Profiles {
             return Err(CoreError::UnknownProfile(self.default.clone()));
         }
         for (name, p) in &self.profiles {
-            p.validate().map_err(|e| CoreError::Token(format!("profile `{name}`: {e}")))?;
+            p.validate()
+                .map_err(|e| CoreError::Token(format!("profile `{name}`: {e}")))?;
         }
         Ok(())
     }
@@ -165,16 +173,22 @@ impl MotionProfile {
     pub fn validate(&self) -> Result<(), CoreError> {
         let d = &self.duration;
         if !(d.instant <= d.fast && d.fast < d.normal && d.normal < d.slow && d.slow <= d.page) {
-            return Err(CoreError::Token("durations must increase instant ≤ fast < normal < slow ≤ page".into()));
+            return Err(CoreError::Token(
+                "durations must increase instant ≤ fast < normal < slow ≤ page".into(),
+            ));
         }
         let s = &self.spring;
         if !(s.snappy.response <= s.standard.response && s.standard.response <= s.gentle.response) {
-            return Err(CoreError::Token("spring responses must increase snappy ≤ standard ≤ gentle".into()));
+            return Err(CoreError::Token(
+                "spring responses must increase snappy ≤ standard ≤ gentle".into(),
+            ));
         }
         for t in [s.snappy, s.standard, s.gentle, s.bouncy] {
             t.params()?;
             if !(0.3..=1.5).contains(&t.damping_ratio) {
-                return Err(CoreError::Token("damping ratios must be within [0.3, 1.5]".into()));
+                return Err(CoreError::Token(
+                    "damping ratios must be within [0.3, 1.5]".into(),
+                ));
             }
         }
         for e in [self.easing.standard, self.easing.enter, self.easing.exit] {
@@ -192,7 +206,9 @@ impl MotionProfile {
         unit("elasticity", self.elasticity)?;
         unit("distanceScale", self.distance_scale)?;
         if !(0.8..=1.0).contains(&self.press_scale) {
-            return Err(CoreError::Token("pressScale must be within [0.8, 1]".into()));
+            return Err(CoreError::Token(
+                "pressScale must be within [0.8, 1]".into(),
+            ));
         }
         Ok(())
     }
@@ -216,7 +232,11 @@ impl MotionProfile {
             "normal" => d.normal,
             "slow" => d.slow,
             "page" => d.page,
-            other => return Err(CoreError::Token(format!("unknown duration token `{other}`"))),
+            other => {
+                return Err(CoreError::Token(format!(
+                    "unknown duration token `{other}`"
+                )))
+            }
         })
     }
 
@@ -254,7 +274,12 @@ mod tests {
     fn minimal_never_overshoots() {
         let p = Profiles::builtin();
         let m = p.get("minimal").unwrap();
-        for t in [m.spring.snappy, m.spring.standard, m.spring.gentle, m.spring.bouncy] {
+        for t in [
+            m.spring.snappy,
+            m.spring.standard,
+            m.spring.gentle,
+            m.spring.bouncy,
+        ] {
             assert!(t.damping_ratio >= 1.0);
         }
     }
@@ -266,7 +291,10 @@ mod tests {
         for (name, prof) in &p.profiles {
             if name != "ultraResponsive" {
                 assert!(ur.duration.normal <= prof.duration.normal, "{name}");
-                assert!(ur.spring.standard.response <= prof.spring.standard.response, "{name}");
+                assert!(
+                    ur.spring.standard.response <= prof.spring.standard.response,
+                    "{name}"
+                );
             }
         }
     }

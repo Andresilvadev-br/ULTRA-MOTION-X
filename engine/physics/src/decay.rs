@@ -19,13 +19,19 @@ pub struct DecayParams {
 
 impl Default for DecayParams {
     fn default() -> Self {
-        Self { time_constant: 0.325, rest_speed: 0.5 }
+        Self {
+            time_constant: 0.325,
+            rest_speed: 0.5,
+        }
     }
 }
 
 impl DecayParams {
     pub fn new(time_constant: f64, rest_speed: f64) -> Result<Self, PhysicsError> {
-        let p = Self { time_constant, rest_speed };
+        let p = Self {
+            time_constant,
+            rest_speed,
+        };
         p.validate()?;
         Ok(p)
     }
@@ -34,7 +40,10 @@ impl DecayParams {
     /// (e.g. 0.998 "normal", 0.99 "fast").
     pub fn from_deceleration_rate(rate: f64) -> Result<Self, PhysicsError> {
         check_range("deceleration_rate", rate, 0.5, 0.999_999)?;
-        Self::new(-1.0 / (1000.0 * math::ln(rate)), DecayParams::default().rest_speed)
+        Self::new(
+            -1.0 / (1000.0 * math::ln(rate)),
+            DecayParams::default().rest_speed,
+        )
     }
 
     pub fn validate(&self) -> Result<(), PhysicsError> {
@@ -62,7 +71,12 @@ impl Decay {
         } else {
             params.time_constant * math::ln(velocity.abs() / params.rest_speed)
         };
-        Ok(Self { params, from, velocity, finish_time })
+        Ok(Self {
+            params,
+            from,
+            velocity,
+            finish_time,
+        })
     }
 
     /// Final resting position `x₀ + v₀τ` (the limit as t → ∞).
@@ -87,7 +101,13 @@ impl Decay {
             return (MotionState::new(x, 0.0), true);
         }
         let e = math::exp(-t / tau);
-        (MotionState::new(self.from + self.velocity * tau * (1.0 - e), self.velocity * e), false)
+        (
+            MotionState::new(
+                self.from + self.velocity * tau * (1.0 - e),
+                self.velocity * e,
+            ),
+            false,
+        )
     }
 
     /// Analytic time at which the trajectory reaches `x`, if it ever does.
