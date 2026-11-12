@@ -82,7 +82,7 @@ export function walk(root: string, opts: WalkOptions = {}): string[] {
     for (const name of entries.sort()) {
       if (name.startsWith(".") && name !== ".claude") continue;
       const full = join(dir, name);
-      let st;
+      let st: ReturnType<typeof statSync>;
       try {
         st = statSync(full);
       } catch {

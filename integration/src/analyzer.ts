@@ -323,7 +323,11 @@ export function analyzeProject(root: string): ProjectReport {
 
 function dedupe(d: Detection[]): Detection[] {
   const seen = new Set<string>();
-  return d.filter((x) => (seen.has(x.name) ? false : (seen.add(x.name), true)));
+  return d.filter((x) => {
+    if (seen.has(x.name)) return false;
+    seen.add(x.name);
+    return true;
+  });
 }
 
 function detectEntries(root: string, files: string[], frameworks: string[]): string[] {
