@@ -1,0 +1,51 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="theme-color" content="#0a0c12">
+  <title>Ultra Motion X — Studio</title>
+  <link rel="stylesheet" href="/studio/style.css">
+</head>
+<body>
+  <div class="shell">
+    <aside class="sidebar">
+      <div class="brand"><span class="logo">X</span><div><b>ULTRA MOTION X</b><small>STUDIO · PREVIEW</small></div></div>
+      <div class="nav-label">LABORATORY</div>
+      <button class="nav active" data-lab="spring">◉ <span>Spring Physics</span></button>
+      <button class="nav" data-lab="components">◫ <span>Component Motion</span></button>
+      <button class="nav" data-lab="profiles">◇ <span>Motion DNA</span></button>
+      <div class="sidebar-bottom"><span class="online"></span> Powered by UMX SDK <small>Local preview, not a benchmark</small></div>
+    </aside>
+    <main class="workspace">
+      <header class="top"><div><p class="eyebrow">MOTION LAB / INTERACTIVE</p><h1 id="page-title">Spring Physics</h1><p class="sub" id="page-desc">Feel the dynamics of a real Ultra Motion X spring.</p></div><div class="top-actions"><span class="chip" id="engine-state">Connecting…</span><button class="button secondary" id="reset">Reset</button><button class="button primary" id="replay">▶ Play motion</button></div></header>
+      <section class="layout">
+        <div class="content">
+          <div class="stage panel">
+            <div class="stage-head"><span>LIVE PREVIEW</span><span id="profile-indicator">professional</span></div>
+            <div class="preview" id="preview"><div class="axis"></div><div class="orb" id="orb"><div class="orb-core">X</div></div></div>
+            <div class="stage-footer"><span>Actual SDK animation · Browser compositor</span><span id="motion-status">Ready</span></div>
+          </div>
+          <div class="graph panel"><div class="panel-heading"><div><b>Motion response</b><small>Sampled from the real analytical spring implementation</small></div><span class="chip">POSITION / TIME</span></div><canvas id="curve" width="720" height="210" aria-label="Spring response curve"></canvas><div class="graph-label"><span>0 ms</span><span id="duration-label">1000 ms</span></div></div>
+          <div class="components panel"><div class="panel-heading"><div><b>Interaction playground</b><small>Click to test live components using the SDK</small></div></div><div class="demo-row"><button class="button primary" id="demo-button">Press me</button><button class="button secondary" id="demo-toast">Show notification</button><button class="button secondary" id="demo-card">Animate card</button><div class="demo-tile" id="demo-tile">UMX <small>Motion card</small></div></div><div class="toast" id="toast" role="status" aria-live="polite">Ultra Motion X is running.</div></div>
+        </div>
+        <aside class="controls panel">
+          <div class="panel-heading"><div><b>Motion configuration</b><small>Changes affect live physics &amp; preview</small></div></div>
+          <label class="form-field"><span>Motion DNA Profile</span><select id="profile"><option value="professional">Professional</option><option value="minimal">Minimal</option><option value="cinematic">Cinematic</option><option value="dynamic">Dynamic</option><option value="fluid">Fluid</option><option value="sport">Sport</option><option value="elegant">Elegant</option><option value="ultraResponsive">Ultra Responsive</option><option value="singularity">Singularity</option></select></label>
+          <div class="separator"></div>
+          <label class="range-field"><span>Stiffness <output id="stiffness-out">320</output></span><input type="range" id="stiffness" min="40" max="900" step="10" value="320"></label>
+          <label class="range-field"><span>Damping <output id="damping-out">28</output></span><input type="range" id="damping" min="1" max="110" value="28"></label>
+          <label class="range-field"><span>Mass <output id="mass-out">1.0</output></span><input type="range" id="mass" min="0.2" max="5" step="0.1" value="1"></label>
+          <label class="range-field"><span>Travel distance <output id="distance-out">240 px</output></span><input type="range" id="distance" min="60" max="360" step="10" value="240"></label>
+          <div class="separator"></div>
+          <div class="stats"><div><small>Natural frequency</small><strong id="frequency">—</strong></div><div><small>Damping ratio</small><strong id="ratio">—</strong></div><div><small>Expected settle</small><strong id="settle">—</strong></div><div><small>Engine mode</small><strong id="mode">—</strong></div></div>
+          <button id="export" class="button secondary full">Copy parameters (JSON)</button>
+          <p class="hint">Reduced-motion settings are respected. Live FPS and GPU measurements require independent instrumentation.</p>
+        </aside>
+      </section>
+    </main>
+  </div>
+  <div class="fatal" id="fatal" hidden></div>
+  <script type="module" src="/studio/app.js"></script>
+</body>
+</html>
