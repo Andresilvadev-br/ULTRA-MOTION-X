@@ -378,14 +378,28 @@ export async function run(argv: string[]): Promise<number> {
         const source = findSource(f.source as string | undefined);
         const runWeb = !!f.web;
         const r = runWeb
-          ? spawnSync(process.execPath, [join(source.root, "benchmarks/web/run.mjs")], {
+          ? spawnSync(process.execPath, [join(source.root, "benchmarks/web/browser.mjs")], {
               stdio: "inherit",
               cwd: source.root,
             })
-          : spawnSync("cargo", ["run", "--release", "-q", "-p", "umx-bench", "--", ...(f.quick ? ["--quick"] : [])], {
-              stdio: "inherit",
-              cwd: source.root,
-            });
+          : spawnSync(
+              "cargo",
+              [
+                "run",
+                "--release",
+                "-q",
+                "-p",
+                "umx-bench",
+                "--bin",
+                "umx-bench",
+                "--",
+                ...(f.quick ? ["--quick"] : []),
+              ],
+              {
+                stdio: "inherit",
+                cwd: source.root,
+              },
+            );
         return r.status ?? 1;
       }
       default:

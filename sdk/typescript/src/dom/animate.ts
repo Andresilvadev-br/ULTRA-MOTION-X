@@ -312,7 +312,7 @@ export function animate(
         controls.add(anim);
         if (kindOf(prop) === "transform" || prop === "opacity") compositorEntries.push({ prop, unit, anim });
       }
-      maybeCompositor(t, compositorEntries, opts, engine);
+      if (elements.length <= engine.options.compositorMaxElements) maybeCompositor(t, compositorEntries, opts, engine);
       if (opts.onUpdate) {
         const unsub = [...t.values().entries()].map(([k, mv]) =>
           mv.on("change", () => opts.onUpdate?.({ [k]: mv.get() })),

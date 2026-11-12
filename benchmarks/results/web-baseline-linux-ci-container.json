@@ -1,0 +1,175 @@
+{
+  "kind": "umx-web-bench",
+  "version": "1.0.0",
+  "environment": {
+    "browser": "chromium 153.0.8010.12",
+    "headless": true,
+    "os": "linux 6.18.44-fc-v378",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "threads": 4,
+    "node": "22.23.4",
+    "quick": false,
+    "durationMs": 4000
+  },
+  "caveats": [
+    "Headless Chromium; GPU compositing and display refresh are not representative.",
+    "engineWorkMs is measured with performance.now() inside the page; frame intervals come from requestAnimationFrame timestamps."
+  ],
+  "results": {
+    "transform-100-raf": {
+      "frames": 241,
+      "frameIntervalMs": {
+        "p50": 16.699999999999818,
+        "p95": 16.700000000000728,
+        "p99": 16.799999999999955
+      },
+      "engineWorkMs": {
+        "p50": 0.30000000004656613,
+        "p95": 0.6000000000931323,
+        "p99": 0.6999999999534339
+      },
+      "updateMs": {
+        "p50": 0.10000000009313226,
+        "p95": 0.1999999999650754
+      },
+      "writeMs": {
+        "p50": 0.19999999995343387,
+        "p95": 0.39999999991850926
+      },
+      "droppedFrames": {
+        "value": 0,
+        "provenance": "estimated"
+      },
+      "refreshHz": {
+        "value": 60,
+        "provenance": "estimated"
+      },
+      "writes": 24100,
+      "redundantWritesSkipped": 0
+    },
+    "transform-1000-raf": {
+      "frames": 241,
+      "frameIntervalMs": {
+        "p50": 16.699999999999818,
+        "p95": 16.705000000000243,
+        "p99": 16.800000000000182
+      },
+      "engineWorkMs": {
+        "p50": 2.300000000046566,
+        "p95": 4.005000000004655,
+        "p99": 4.699999999953434
+      },
+      "updateMs": {
+        "p50": 0.6999999999534339,
+        "p95": 1.1999999999534339
+      },
+      "writeMs": {
+        "p50": 1.5999999998603016,
+        "p95": 2.9000000001396984
+      },
+      "droppedFrames": {
+        "value": 0,
+        "provenance": "estimated"
+      },
+      "refreshHz": {
+        "value": 60,
+        "provenance": "estimated"
+      },
+      "writes": 241000,
+      "redundantWritesSkipped": 0
+    },
+    "transform-1000-compositor": {
+      "frames": 240,
+      "frameIntervalMs": {
+        "p50": 16.699999999999818,
+        "p95": 16.700000000000728,
+        "p99": 16.800000000000097
+      },
+      "engineWorkMs": {
+        "p50": 2.349999999976717,
+        "p95": 4.6049999998649565,
+        "p99": 6.7100000000931175
+      },
+      "updateMs": {
+        "p50": 0.6999999999534339,
+        "p95": 1.3050000000395796
+      },
+      "writeMs": {
+        "p50": 1.6000000000931323,
+        "p95": 3.1999999999650752
+      },
+      "droppedFrames": {
+        "value": 1,
+        "provenance": "estimated"
+      },
+      "refreshHz": {
+        "value": 60,
+        "provenance": "estimated"
+      },
+      "writes": 240000,
+      "redundantWritesSkipped": 0
+    },
+    "opacity-1000-raf": {
+      "frames": 240,
+      "frameIntervalMs": {
+        "p50": 16.699999999999818,
+        "p95": 16.79999999999932,
+        "p99": 16.800000000000182
+      },
+      "engineWorkMs": {
+        "p50": 1.1999999999534339,
+        "p95": 2,
+        "p99": 2.5439999999897496
+      },
+      "updateMs": {
+        "p50": 0.39999999990686774,
+        "p95": 0.6000000000931323
+      },
+      "writeMs": {
+        "p50": 0.8000000000465661,
+        "p95": 1.4000000001396984
+      },
+      "droppedFrames": {
+        "value": 0,
+        "provenance": "estimated"
+      },
+      "refreshHz": {
+        "value": 60,
+        "provenance": "estimated"
+      },
+      "writes": 240000,
+      "redundantWritesSkipped": 0
+    },
+    "transform-3000-raf": {
+      "frames": 103,
+      "frameIntervalMs": {
+        "p50": 33.40000000000009,
+        "p95": 66.69999999999982,
+        "p99": 66.70000000000027
+      },
+      "engineWorkMs": {
+        "p50": 9.899999999906868,
+        "p95": 15.369999999925492,
+        "p99": 20.284000000045637
+      },
+      "updateMs": {
+        "p50": 3.9000000001396984,
+        "p95": 6.409999999986022
+      },
+      "writeMs": {
+        "p50": 5.800000000046566,
+        "p95": 9.300000000116407
+      },
+      "droppedFrames": {
+        "value": 24,
+        "provenance": "estimated"
+      },
+      "refreshHz": {
+        "value": 30,
+        "provenance": "estimated"
+      },
+      "writes": 309000,
+      "redundantWritesSkipped": 0
+    }
+  }
+}

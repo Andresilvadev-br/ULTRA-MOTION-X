@@ -1,0 +1,120 @@
+{
+  "environment": {
+    "arch": "x86_64",
+    "cpu": "Intel(R) Xeon(R) Processor @ 2.10GHz",
+    "iterations": 300,
+    "os": "linux",
+    "profile": "release",
+    "quick": false,
+    "threads": 4
+  },
+  "kind": "umx-native-bench",
+  "results": {
+    "compile_example_app": {
+      "dist": {
+        "count": 300,
+        "max": 224107.0,
+        "mean": 141591.69,
+        "min": 120744.0,
+        "p50": 138949.0,
+        "p95": 165620.35,
+        "p99": 185672.82999999996,
+        "stddev": 14008.91226233857
+      },
+      "unit": "ns per compilation"
+    },
+    "compose_2000_layers_10pct_dirty": {
+      "dist": {
+        "count": 300,
+        "max": 148933.0,
+        "mean": 111585.89333333333,
+        "min": 99891.0,
+        "p50": 111009.0,
+        "p95": 132630.55000000002,
+        "p99": 140218.06,
+        "stddev": 10757.657751045172
+      },
+      "unit": "ns per composition"
+    },
+    "engine_frame_10000_values": {
+      "dist": {
+        "count": 300,
+        "max": 833773.0,
+        "mean": 710182.13,
+        "min": 658010.0,
+        "p50": 692672.5,
+        "p95": 791250.7000000001,
+        "p99": 818344.7899999999,
+        "stddev": 41206.78541769262
+      },
+      "unit": "ns per frame (25% retargeted each frame)"
+    },
+    "engine_frame_1000_values": {
+      "dist": {
+        "count": 300,
+        "max": 104776.0,
+        "mean": 53573.69666666666,
+        "min": 50086.0,
+        "p50": 51120.0,
+        "p95": 66783.35,
+        "p99": 80677.53999999986,
+        "stddev": 7073.605266386834
+      },
+      "unit": "ns per frame (25% retargeted each frame)"
+    },
+    "engine_frame_100_values": {
+      "dist": {
+        "count": 300,
+        "max": 16478.0,
+        "mean": 4982.983333333334,
+        "min": 4813.0,
+        "p50": 4882.0,
+        "p95": 4954.4,
+        "p99": 6915.839999999987,
+        "stddev": 959.2178704838416
+      },
+      "unit": "ns per frame (25% retargeted each frame)"
+    },
+    "graph_500_instances_toggle_and_tick": {
+      "dist": {
+        "count": 300,
+        "max": 7803595.0,
+        "mean": 386733.70666666667,
+        "min": 263288.0,
+        "p50": 312478.0,
+        "p95": 630411.4,
+        "p99": 1572481.6899999932,
+        "stddev": 509948.8700163124
+      },
+      "unit": "ns per frame"
+    },
+    "particles_step": {
+      "alive": 19931,
+      "dist": {
+        "count": 300,
+        "max": 902563.0,
+        "mean": 760394.9733333334,
+        "min": 700887.0,
+        "p50": 738169.5,
+        "p95": 856483.8,
+        "p99": 879566.65,
+        "stddev": 46470.1645865311
+      },
+      "unit": "ns per fixed step"
+    },
+    "spring_sample_10k": {
+      "dist": {
+        "count": 300,
+        "max": 209621.0,
+        "mean": 131497.47,
+        "min": 125110.0,
+        "p50": 125627.5,
+        "p95": 147833.75,
+        "p99": 159660.8,
+        "stddev": 9739.106241459394
+      },
+      "unit": "ns per 10k samples"
+    }
+  },
+  "version": "1.0.0"
+}

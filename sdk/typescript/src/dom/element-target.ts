@@ -243,6 +243,13 @@ export class ElementTarget {
     return false;
   }
 
+  /** Current numeric values with their units (colour slots excluded). */
+  numericSnapshot(): Map<string, NumericValue> {
+    const m = new Map<string, NumericValue>();
+    for (const [k, s] of this.slots) if (s.kind !== "color") m.set(k, { value: s.mv.get(), unit: s.unit });
+    return m;
+  }
+
   values(): Map<string, MotionValue> {
     const m = new Map<string, MotionValue>();
     for (const [k, s] of this.slots) m.set(k, s.mv);

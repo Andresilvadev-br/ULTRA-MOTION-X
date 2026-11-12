@@ -7,9 +7,10 @@
  */
 import type { ValueAnimation } from "../core/motion-value.ts";
 import type { ElementTarget } from "./element-target.ts";
-import { composeTransform, type NumericValue } from "./props.ts";
+import { composeTransform } from "./props.ts";
 
 const SAMPLES_PER_SECOND = 60;
+const MAX_SAMPLES = 90;
 const active = new WeakMap<ElementTarget, CompositorRun>();
 
 export class CompositorRun {
@@ -55,17 +56,20 @@ export function startCompositor(
   const gens = entries.map((e) => e.anim.gen);
   if (gens.some((g) => !Number.isFinite(g.duration) || g.duration <= 0)) return null;
   const duration = Math.max(...gens.map((g) => g.duration));
-  const n = Math.min(240, Math.max(2, Math.ceil(duration * SAMPLES_PER_SECOND)));
-  const frames: Keyframe[] = [];
+  // Linear interpolation between samples; the cap bounds the cost of long animations.
+  const n = Math.min(MAX_SAMPLES, Math.max(2, Math.ceil(duration * SAMPLES_PER_SECOND)));
+  const frames: Keyframe[] = new Array(n + 1);
+  // Static (non-animated) transform components keep their current value and unit.
+  const map = kind === "transform" ? target.numericSnapshot() : null;
+  const animated = entries.map((e) => ({ slot: { value: 0, unit: e.unit }, prop: e.prop }));
+  if (map) for (const a of animated) map.set(a.prop, a.slot);
   for (let i = 0; i <= n; i++) {
     const t = (duration * i) / n;
     if (kind === "opacity") {
-      frames.push({ opacity: String(clamp01(gens[0]!.sample(t).value)) });
+      frames[i] = { opacity: String(clamp01(gens[0]!.sample(t).value)) };
     } else {
-      const map = new Map<string, NumericValue>();
-      for (const [prop, mv] of target.values()) map.set(prop, { value: mv.get(), unit: "px" });
-      entries.forEach((e, k) => map.set(e.prop, { value: gens[k]!.sample(t).value, unit: e.unit }));
-      frames.push({ transform: composeTransform((p) => map.get(p)) || "none" });
+      for (let k = 0; k < animated.length; k++) animated[k]!.slot.value = gens[k]!.sample(t).value;
+      frames[i] = { transform: composeTransform((p) => map!.get(p)) || "none" };
     }
   }
   previous(target)?.release();

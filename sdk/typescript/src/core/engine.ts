@@ -40,6 +40,12 @@ export interface EngineOptions {
   telemetry?: boolean | "detailed";
   /** Compositor (Web Animations API) offloading: "auto" (opacity-only), "always" or "never". */
   compositor?: "auto" | "always" | "never";
+  /**
+   * Compositor offload is skipped for animate() calls targeting more elements than this:
+   * baking WAAPI keyframes costs main-thread time per element (measured ≈ 0.2 ms/element
+   * in Chromium), which outweighs the benefit for large batches. Default 32.
+   */
+  compositorMaxElements?: number;
   /** Observe visibility / battery / compute pressure. Default true in browsers. */
   powerAware?: boolean;
   /** Expose the engine on `globalThis.__ULTRA_MOTION_X__` for DevTools. */
@@ -63,7 +69,8 @@ export class Engine {
   readonly a11y: Accessibility;
   readonly power = new PowerMonitor();
   dna: MotionDNA;
-  options: Required<Pick<EngineOptions, "maxDelta" | "budgetFraction" | "compositor">> & EngineOptions;
+  options: Required<Pick<EngineOptions, "maxDelta" | "budgetFraction" | "compositor" | "compositorMaxElements">> &
+    EngineOptions;
 
   /** Engine time in seconds (sum of applied frame deltas). */
   time = 0;
@@ -84,7 +91,7 @@ export class Engine {
 
   constructor(opts: EngineOptions = {}) {
     this.driver = opts.driver ?? createDefaultDriver();
-    this.options = { maxDelta: 100, budgetFraction: 0.5, compositor: "auto", ...opts };
+    this.options = { maxDelta: 100, budgetFraction: 0.5, compositor: "auto", compositorMaxElements: 32, ...opts };
     this.telemetry = new Telemetry(240, opts.telemetry === "detailed");
     this.fidelity = new FidelityController(opts.fidelity);
     this.a11y = new Accessibility({

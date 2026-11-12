@@ -1,0 +1,44 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><link rel="icon" href="data:,">
+  <title>Benchmark harness — Ultra Motion X</title>
+  <style>body{margin:0;background:#090b10}#stage{position:relative;width:100vw;height:100vh;overflow:hidden}.d{position:absolute;width:8px;height:8px;background:#ff8748;border-radius:2px}</style>
+</head>
+<body>
+  <div id="stage"></div>
+  <script type="module">
+    // Benchmark harness driven by benchmarks/web/browser.mjs. Exposes window.runScenario.
+    const umx = await import("/sdk/typescript/dist/index.js");
+    window.runScenario = async ({ count, durationMs, compositor, retargetEveryMs, prop }) => {
+      const engine = umx.configureEngine({ telemetry: "detailed", compositor: compositor ? "always" : "never", powerAware: false });
+      const stage = document.getElementById("stage");
+      stage.replaceChildren(...Array.from({ length: count }, (_, i) => {
+        const d = document.createElement("div");
+        d.className = "d";
+        d.style.left = `${(i * 13) % (innerWidth - 10)}px`;
+        d.style.top = `${(i * 7) % (innerHeight - 10)}px`;
+        return d;
+      }));
+      const els = [...stage.children];
+      const w = innerWidth / 3;
+      let flip = false;
+      const kick = () => {
+        flip = !flip;
+        umx.animate(els, prop === "opacity" ? { opacity: flip ? 0.2 : 1 } : { x: flip ? w : 0, rotate: flip ? 90 : 0 }, { spring: "standard", compositor });
+      };
+      kick();
+      const timer = setInterval(kick, retargetEveryMs);
+      // Warm-up, then reset telemetry and measure.
+      await new Promise((r) => setTimeout(r, 500));
+      engine.telemetry.reset();
+      await new Promise((r) => setTimeout(r, durationMs));
+      clearInterval(timer);
+      const report = engine.report();
+      umx.stop(els);
+      return report;
+    };
+    window.ready = true;
+  </script>
+</body>
+</html>
