@@ -1,0 +1,20 @@
+[package]
+name = "umx-physics"
+description = "Ultra Motion X physics: analytic springs, inertia, gestures, constraints and deterministic fixed-step simulation."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+libm.workspace = true
+serde = { workspace = true, optional = true }
+
+[features]
+default = ["serde"]
+serde = ["dep:serde"]
+
+[lints]
+workspace = true

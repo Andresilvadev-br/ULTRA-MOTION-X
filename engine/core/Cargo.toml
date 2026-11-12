@@ -1,0 +1,18 @@
+[package]
+name = "umx-core"
+description = "Ultra Motion X core: easing, keyframes, generators, timelines, playback, property arbitration and Motion DNA tokens."
+version.workspace = true
+edition.workspace = true
+rust-version.workspace = true
+license.workspace = true
+repository.workspace = true
+authors.workspace = true
+
+[dependencies]
+umx-physics.workspace = true
+serde.workspace = true
+serde_json.workspace = true
+libm.workspace = true
+
+[lints]
+workspace = true

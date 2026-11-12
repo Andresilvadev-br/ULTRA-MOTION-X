@@ -1,0 +1,11 @@
+/target
+node_modules/
+dist/
+*.tsbuildinfo
+.DS_Store
+/coverage
+/test-results
+/benchmarks/results/tmp-*
+*.log
+.umx-tmp/
+/sdk/ffi/tests/build/

@@ -1,0 +1,56 @@
+[workspace]
+resolver = "2"
+members = [
+  "engine/physics",
+  "engine/core",
+  "engine/motion-graph",
+  "engine/compiler",
+  "engine/scheduler",
+  "engine/telemetry",
+  "engine/runtime",
+  "rendering/composition",
+  "sdk/ffi",
+  "benchmarks/native",
+]
+
+[workspace.package]
+version = "1.0.0"
+edition = "2021"
+rust-version = "1.75"
+license = "MIT OR Apache-2.0"
+repository = "https://github.com/andresilvadev-br/ultra-motion-x"
+authors = ["Ultra Motion X contributors"]
+
+[workspace.dependencies]
+libm = "0.2.16"
+serde = { version = "1.0.229", features = ["derive"] }
+serde_json = "1.0.154"
+umx-physics = { path = "engine/physics", version = "1.0.0" }
+umx-core = { path = "engine/core", version = "1.0.0" }
+umx-graph = { path = "engine/motion-graph", version = "1.0.0" }
+umx-compiler = { path = "engine/compiler", version = "1.0.0" }
+umx-scheduler = { path = "engine/scheduler", version = "1.0.0" }
+umx-telemetry = { path = "engine/telemetry", version = "1.0.0" }
+umx-runtime = { path = "engine/runtime", version = "1.0.0" }
+umx-render = { path = "rendering/composition", version = "1.0.0" }
+
+[workspace.lints.rust]
+unsafe_op_in_unsafe_fn = "deny"
+missing_debug_implementations = "warn"
+
+[workspace.lints.clippy]
+dbg_macro = "deny"
+todo = "deny"
+unimplemented = "deny"
+
+[profile.release]
+opt-level = 3
+lto = "thin"
+codegen-units = 1
+
+[profile.wasm]
+inherits = "release"
+opt-level = "s"
+lto = true
+panic = "abort"
+strip = true
