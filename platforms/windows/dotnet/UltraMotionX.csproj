@@ -1,0 +1,19 @@
+<Project Sdk="Microsoft.NET.Sdk">
+  <!-- Managed bindings for Ultra Motion X. Define WPF or WINUI to include a UI driver:
+       dotnet build -p:DefineConstants=WPF  (and set UseWPF=true / Windows TFM) -->
+  <PropertyGroup>
+    <TargetFrameworks>net8.0</TargetFrameworks>
+    <Nullable>enable</Nullable>
+    <LangVersion>latest</LangVersion>
+    <AssemblyName>UltraMotionX</AssemblyName>
+    <RootNamespace>UltraMotionX</RootNamespace>
+    <Version>1.0.0</Version>
+  </PropertyGroup>
+  <ItemGroup>
+    <Compile Include="src/**/*.cs" />
+    <Compile Include="Wpf/**/*.cs" />
+    <Compile Include="WinUI/**/*.cs" />
+    <!-- Native library built by `cargo build -p umx-ffi --release` -->
+    <None Include="native/*ultra_motion_x*" CopyToOutputDirectory="PreserveNewest" Condition="Exists('native')" />
+  </ItemGroup>
+</Project>

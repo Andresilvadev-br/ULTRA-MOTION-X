@@ -1,0 +1,11 @@
+{
+  "FileVersion": 3,
+  "Version": 1,
+  "VersionName": "1.0.0",
+  "FriendlyName": "Ultra Motion X",
+  "Description": "Physics-based UI motion (springs, inertia, motion graphs) for UMG menus, HUDs and transitions via the Ultra Motion X native core.",
+  "Category": "UI",
+  "CreatedBy": "Ultra Motion X contributors",
+  "CanContainContent": false,
+  "Modules": [{ "Name": "UltraMotionX", "Type": "Runtime", "LoadingPhase": "Default" }]
+}

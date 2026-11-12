@@ -1,0 +1,11 @@
+# Example build for the Qt adapter. Requires Qt 6 and the native library from `cargo build -p umx-ffi --release`.
+cmake_minimum_required(VERSION 3.21)
+project(umx_qt_example LANGUAGES CXX)
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_AUTOMOC ON)
+find_package(Qt6 REQUIRED COMPONENTS Gui Qml Quick)
+set(UMX_ROOT "${CMAKE_CURRENT_LIST_DIR}/../../.." CACHE PATH "Ultra Motion X repository root")
+add_executable(umx_qt_example example/main.cpp umx_qt.hpp)
+target_include_directories(umx_qt_example PRIVATE "${UMX_ROOT}/sdk/ffi/include" "${CMAKE_CURRENT_LIST_DIR}")
+find_library(UMX_LIB NAMES ultra_motion_x PATHS "${UMX_ROOT}/target/release" REQUIRED)
+target_link_libraries(umx_qt_example PRIVATE Qt6::Gui Qt6::Qml Qt6::Quick "${UMX_LIB}")
