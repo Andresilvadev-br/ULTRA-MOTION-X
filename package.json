@@ -1,0 +1,37 @@
+{
+  "name": "ultra-motion-x-monorepo",
+  "private": true,
+  "version": "1.0.0",
+  "description": "Ultra Motion X \u2014 universal motion, physics, rendering and interaction engine.",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "engines": {
+    "node": ">=20.11"
+  },
+  "workspaces": [
+    "sdk/typescript"
+  ],
+  "scripts": {
+    "gen": "node scripts/gen-tokens.mjs && node scripts/build-wasm.mjs",
+    "gen:tokens": "node scripts/gen-tokens.mjs",
+    "build:wasm": "node scripts/build-wasm.mjs",
+    "typecheck": "tsc -b tsconfig.json",
+    "build": "node scripts/build.mjs",
+    "lint": "biome check .",
+    "format": "biome format --write .",
+    "test": "node scripts/run-tests.mjs unit",
+    "test:browser": "node scripts/run-tests.mjs browser",
+    "test:integration": "node scripts/run-tests.mjs integration",
+    "test:all": "node scripts/run-tests.mjs all",
+    "bench:native": "cargo run --release -p umx-bench",
+    "bench:web": "node benchmarks/web/run.mjs",
+    "studio": "node studio/serve.mjs",
+    "examples": "node examples/serve.mjs"
+  },
+  "devDependencies": {
+    "@biomejs/biome": "2.2.4",
+    "@types/node": "22.18.6",
+    "esbuild": "0.25.10",
+    "typescript": "5.9.3"
+  }
+}

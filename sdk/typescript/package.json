@@ -1,0 +1,43 @@
+{
+  "name": "@ultra-motion-x/web",
+  "version": "1.0.0",
+  "description": "Ultra Motion X Web SDK: framework-agnostic motion, physics, gestures, layout transitions and adaptive rendering for the DOM.",
+  "license": "MIT OR Apache-2.0",
+  "type": "module",
+  "sideEffects": false,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "exports": {
+    ".": {
+      "umx-source": "./src/index.ts",
+      "types": "./dist/index.d.ts",
+      "default": "./dist/index.js"
+    },
+    "./wasm": {
+      "umx-source": "./src/wasm/index.ts",
+      "types": "./dist/wasm/index.d.ts",
+      "default": "./dist/wasm/index.js"
+    },
+    "./wasm/ultra_motion_x.wasm": "./wasm/ultra_motion_x.wasm",
+    "./package.json": "./package.json"
+  },
+  "files": [
+    "dist",
+    "src",
+    "wasm",
+    "README.md"
+  ],
+  "scripts": {
+    "build": "tsc -b",
+    "test": "node --conditions=umx-source --test test/*.test.ts"
+  },
+  "keywords": [
+    "animation",
+    "motion",
+    "spring",
+    "physics",
+    "gestures",
+    "flip",
+    "webassembly"
+  ]
+}
