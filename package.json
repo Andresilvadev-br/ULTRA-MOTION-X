@@ -9,7 +9,9 @@
     "node": ">=20.11"
   },
   "workspaces": [
-    "sdk/typescript"
+    "sdk/typescript",
+    "rendering/web",
+    "devtools"
   ],
   "scripts": {
     "gen": "node scripts/gen-tokens.mjs && node scripts/build-wasm.mjs",

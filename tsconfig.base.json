@@ -20,7 +20,6 @@
     "sourceMap": true,
     "skipLibCheck": true,
     "resolveJsonModule": true,
-    "customConditions": ["umx-source"],
     "composite": true,
     "forceConsistentCasingInFileNames": true
   }

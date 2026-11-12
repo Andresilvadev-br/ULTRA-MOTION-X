@@ -53,7 +53,15 @@ export { FrameScheduler, type Phase, type TaskPriority } from "./core/scheduler.
 export { resolveSpec, resolveSpring, type TransitionOptions } from "./core/spec.ts";
 export { type Distribution, distribution, type Metric, percentile } from "./core/stats.ts";
 // DOM
-export { type AnimateOptions, type AnimationControls, animate, motionValueOf, set, stagger, stop } from "./dom/animate.ts";
+export {
+  type AnimateOptions,
+  type AnimationControls,
+  animate,
+  motionValueOf,
+  set,
+  stagger,
+  stop,
+} from "./dom/animate.ts";
 export { ElementTarget } from "./dom/element-target.ts";
 // Graph & orchestration
 export {

@@ -67,6 +67,8 @@ export class Engine {
 
   /** Engine time in seconds (sum of applied frame deltas). */
   time = 0;
+  /** Global time scale (DevTools slow motion / Studio playback). 1 = real time. */
+  timeScale = 1;
   frameCount = 0;
   /** Number of live MotionValues (maintained by MotionValue). */
   valueCount = 0;
@@ -172,7 +174,9 @@ export class Engine {
     const fixed = this.options.fixedStep;
     let dtMs = fixed ?? (this.lastTimestamp === null ? 0 : ts - this.lastTimestamp);
     if (!(dtMs >= 0)) dtMs = 0;
-    dtMs = Math.min(dtMs, this.options.maxDelta);
+    dtMs =
+      Math.min(dtMs, this.options.maxDelta) *
+      (Number.isFinite(this.timeScale) && this.timeScale >= 0 ? this.timeScale : 1);
     this.lastTimestamp = ts;
     if (this.refresh.sample(ts)) this.telemetry.expectedInterval = this.refresh.intervalMs;
     if (this.refresh.hasEstimate && dtMs > 0) {

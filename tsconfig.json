@@ -1,0 +1,14 @@
+{
+  "files": [],
+  "references": [
+    {
+      "path": "sdk/typescript"
+    },
+    {
+      "path": "rendering/web"
+    },
+    {
+      "path": "devtools"
+    }
+  ]
+}
