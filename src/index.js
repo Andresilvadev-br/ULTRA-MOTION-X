@@ -20,8 +20,13 @@ import { EffectsLayer } from './effects/effects-layer.js';
 import { CapsuleMorph } from './capsule/capsule.js';
 import { HostBridge } from './bridge/host-bridge.js';
 import { MotionIntentBridge } from './ai/intent-bridge.js';
+import { MagneticField } from './interactions/magnetic.js';
+import { SurfaceMaterial } from './interactions/surface.js';
+import { LiquidIndicator } from './interactions/indicator.js';
+import { layoutTransition } from './transitions/layout.js';
+import { writeDNA } from './theme/dna.js';
 
-export const VERSION = '1.1.0';
+export const VERSION = '1.2.0';
 
 /**
  * Cria uma instância completa do motor.
@@ -100,6 +105,16 @@ export function createUltraMotionX(options = {}) {
     number: (el, value, opts) => micro.number(el, value, opts),
     draggable: (el, opts) => draggable(animator, el, opts),
     capsule: (el, opts) => new CapsuleMorph(el, { animator, scheduler, budget, ...opts }),
+    /** Atração magnética ao cursor (liga com .bind(root)). */
+    magnetic: (opts) => new MagneticField({ animator, scheduler, budget, ...opts }),
+    /** Material reativo: luz e inclinação 2.5D por variáveis CSS (liga com .bind(root)). */
+    surface: (opts) => new SurfaceMaterial({ scheduler, budget, ...opts }),
+    /** Indicador líquido (menus, abas, segmentos). */
+    indicator: (el, opts) => new LiquidIndicator(el, { scheduler, budget, ...opts }),
+    /** Transição de layout por chave (FLIP) em volta de uma mutação do DOM. */
+    layout: (root, mutate, opts) => layoutTransition(animator, root, mutate, opts),
+    /** Publica o Motion DNA (molas como variáveis CSS). */
+    dna: (target = root?.documentElement, dna) => writeDNA(target, dna),
 
     /** Personagem (ex.: Chico). renderer padrão: SVG procedural sobre a arte existente. */
     character(element, { states, initial, gestures, eyeOpen, renderer } = {}) {
@@ -180,3 +195,8 @@ export { CapsuleMorph } from './capsule/capsule.js';
 export { HostBridge } from './bridge/host-bridge.js';
 export { MotionIntentBridge, validateIntent, INTENTS } from './ai/intent-bridge.js';
 export { createGsapAdapter } from './adapters/gsap.js';
+export { MagneticField, magnetOffset } from './interactions/magnetic.js';
+export { SurfaceMaterial, surfaceTargets } from './interactions/surface.js';
+export { LiquidIndicator } from './interactions/indicator.js';
+export { layoutTransition } from './transitions/layout.js';
+export { MOTION_DNA, dnaTokens, writeDNA, springEasing } from './theme/dna.js';
