@@ -16,10 +16,17 @@ import { MotionValue } from '../animate/motion-value.js';
  * O feedback é só de interação: nunca espera o backend e nunca afirma sucesso.
  */
 export class MicroInteractions {
-  constructor({ animator, scheduler, budget = null } = {}) {
+  constructor({ animator, scheduler, budget = null, selectors = {}, pressScale = 0.96 } = {}) {
     this.animator = animator;
     this.scheduler = scheduler;
     this.budget = budget;
+    this.pressScale = pressScale;
+    /** Seletores configuráveis: apps existentes podem usar suas próprias classes (ex.: ".btn"). */
+    this.sel = {
+      press: selectors.press ?? '[data-umx-press]',
+      hover: selectors.hover ?? '[data-umx-hover]',
+      light: selectors.light ?? '[data-umx-light]',
+    };
     /** Latência entrada → primeiro frame com feedback (ms), para QA interno. */
     this.latency = new SampleStats(200);
     this._roots = new Map();
@@ -34,7 +41,7 @@ export class MicroInteractions {
 
     on('pointerdown', (e) => {
       if (e.button !== 0 && e.pointerType === 'mouse') return;
-      const el = e.target.closest?.('[data-umx-press]');
+      const el = e.target.closest?.(this.sel.press);
       if (el && !el.matches(':disabled,[aria-disabled="true"]')) this.press(el, e.timeStamp);
     }, { passive: true });
     const release = () => { for (const el of [...this._pressed]) this.release(el); };
@@ -43,27 +50,27 @@ export class MicroInteractions {
     on('dragstart', release, { passive: true });
     on('keydown', (e) => {
       if ((e.key === 'Enter' || e.key === ' ') && !e.repeat) {
-        const el = e.target.closest?.('[data-umx-press]');
-        if (el) this.press(el, e.timeStamp);
+        const el = e.target.closest?.(this.sel.press);
+        if (el && !el.matches(':disabled,[aria-disabled="true"]')) this.press(el, e.timeStamp);
       }
     });
     on('keyup', (e) => { if (e.key === 'Enter' || e.key === ' ') release(); });
 
     on('pointerover', (e) => {
-      const el = e.target.closest?.('[data-umx-hover]');
+      const el = e.target.closest?.(this.sel.hover);
       if (el && !el.contains(e.relatedTarget)) this.hover(el, true);
     }, { passive: true });
     on('pointerout', (e) => {
-      const el = e.target.closest?.('[data-umx-hover]');
+      const el = e.target.closest?.(this.sel.hover);
       if (el && !el.contains(e.relatedTarget)) this.hover(el, false);
-      const pressed = e.target.closest?.('[data-umx-press]');
+      const pressed = e.target.closest?.(this.sel.press);
       if (pressed && this._pressed.has(pressed) && !pressed.contains(e.relatedTarget)) this.release(pressed);
     }, { passive: true });
 
     let lightEl = null, lightPos = null;
     on('pointermove', (e) => {
       if (this.budget && !this.budget.profile.cursorLight) return;
-      const el = e.target.closest?.('[data-umx-light]');
+      const el = e.target.closest?.(this.sel.light);
       if (!el) return;
       const first = !lightPos;
       lightEl = el; lightPos = { x: e.clientX, y: e.clientY };
@@ -81,7 +88,7 @@ export class MicroInteractions {
       });
     }, { passive: true });
     on('pointerleave', (e) => {
-      const el = e.target?.closest?.('[data-umx-light]');
+      const el = e.target?.closest?.(this.sel.light);
       if (el) el.style.setProperty('--umx-lo', '0');
     }, { passive: true, capture: true });
 
@@ -111,7 +118,7 @@ export class MicroInteractions {
 
   press(el, inputTime) {
     this._pressed.add(el);
-    const amount = parseFloat(el.getAttribute('data-umx-press')) || 0.96;
+    const amount = parseFloat(el.getAttribute('data-umx-press')) || this.pressScale;
     this.animator.animate(el, { scale: amount }, { spring: 'snappy' });
     if (inputTime != null) {
       this.scheduler.after(() => this.latency.push(this.scheduler.now() - inputTime));

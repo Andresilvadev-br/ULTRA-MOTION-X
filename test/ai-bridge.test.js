@@ -76,3 +76,18 @@ test('HostBridge: aceita JSON do WebView2, filtra canal e marca simulação', ()
   bridge.send('clip.save.request', { source: 'ui' }, { id: 'c2' });
   assert.deepEqual(posted, [{ channel: 'umx', type: 'clip.save.request', id: 'c2', payload: { source: 'ui' } }]);
 });
+
+test('MicroInteractions aceita seletores do app (ex.: .btn)', async () => {
+  const { MicroInteractions } = await import('../src/interactions/micro.js');
+  const pressed = [];
+  const animator = { animate: (el, props) => { pressed.push(props.scale); return { finished: Promise.resolve(true) }; } };
+  const scheduler = { after() {}, now: () => 0, read() {}, write() {} };
+  const listeners = {};
+  const root = { addEventListener: (t, f) => { listeners[t] = f; }, removeEventListener() {}, querySelectorAll: () => [] };
+  const m = new MicroInteractions({ animator, scheduler, selectors: { press: '.btn' }, pressScale: 0.965 });
+  m.bind(root);
+  const btn = { matches: () => false, getAttribute: () => null };
+  listeners.pointerdown({ button: 0, pointerType: 'mouse', timeStamp: 0, target: { closest: (sel) => (sel === '.btn' ? btn : null) } });
+  listeners.pointerup({});
+  assert.deepEqual(pressed, [0.965, 1]);
+});

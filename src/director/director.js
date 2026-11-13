@@ -44,19 +44,18 @@ export class MotionDirector extends Emitter {
 
   define(name, def) {
     if (this._defs.has(name)) throw new Error(`Coreografia duplicada: ${name}`);
-    validateSteps(def.steps ?? [], `${name}.steps`, false);
-    validateSteps(def.onError ?? [], `${name}.onError`, true);
-    const on = def.on == null ? [] : Array.isArray(def.on) ? def.on : [def.on];
-    this._defs.set(name, {
-      name, on,
-      channel: def.channel ?? name,
-      priority: def.priority ?? 50,
-      concurrency: def.concurrency ?? 'replace',
-      steps: def.steps ?? [],
-      onError: def.onError ?? [],
-      onCancel: def.onCancel,
-    });
+    this._defs.set(name, compile(name, def));
     return () => this._defs.delete(name);
+  }
+
+  /**
+   * Executa uma coreografia sem registro prévio (sequências locais da interface).
+   * Mesmas garantias de define(): validação de anúncios, canal, prioridade e cancelamento.
+   * Devolve a execução (ou null se descartada por prioridade/concorrência).
+   */
+  run(def, payload = {}, { id } = {}) {
+    const name = def.name ?? `run-${this._runSeq + 1}`;
+    return this._start(compile(name, def), normalizeEvent({ type: 'play:run', id, payload }));
   }
 
   /** Recebe um evento (do backend Go, da UI ou de simulação explícita). */
@@ -85,7 +84,7 @@ export class MotionDirector extends Emitter {
     return { accepted: true, started: started.map((r) => r.def.name) };
   }
 
-  /** Executa uma coreografia diretamente (ex.: clique local) sem evento de backend. */
+  /** Executa uma coreografia registrada diretamente (ex.: clique local) sem evento de backend. */
   play(name, payload = {}, { id } = {}) {
     const def = this._defs.get(name);
     if (!def) throw new Error(`Coreografia desconhecida: ${name}`);
@@ -251,7 +250,8 @@ class Run {
       return;
     }
     if (step.delay) {
-      await this.ctx.wait(step.delay);
+      // Atraso declarado no passo é exato (sincronia com CSS/áudio); ctx.wait() é cosmético.
+      await this.ctx.wait(step.delay, { exact: true });
       return;
     }
     if (step.run) {
@@ -305,9 +305,9 @@ function createContext(run) {
       run._disposers.push(() => handle.cancel());
       return handle;
     },
-    /** Pausa cosmética: encurtada pelo perfil e cancelável. */
-    wait(ms) {
-      const scale = director.budget ? Math.max(0.25, director.budget.profile.decor || 0.25) : 1;
+    /** Pausa cosmética: encurtada pelo perfil (exceto com exact) e cancelável. */
+    wait(ms, { exact = false } = {}) {
+      const scale = exact || !director.budget ? 1 : Math.max(0.25, director.budget.profile.decor || 0.25);
       return new Promise((resolve, reject) => {
         const id = director.timers.setTimeout(() => (run.alive ? resolve() : reject(new Cancelled('stale'))), ms * scale);
         run._disposers.push(() => director.timers.clearTimeout(id));
@@ -316,6 +316,21 @@ function createContext(run) {
     emit(type, data) { director.emit(type, { ...data, run: run.def.name, id: run.id }); },
   };
   return ctx;
+}
+
+function compile(name, def) {
+  validateSteps(def.steps ?? [], `${name}.steps`, false);
+  validateSteps(def.onError ?? [], `${name}.onError`, true);
+  const on = def.on == null ? [] : Array.isArray(def.on) ? def.on : [def.on];
+  return {
+    name, on,
+    channel: def.channel ?? name,
+    priority: def.priority ?? 50,
+    concurrency: def.concurrency ?? 'replace',
+    steps: def.steps ?? [],
+    onError: def.onError ?? [],
+    onCancel: def.onCancel,
+  };
 }
 
 function validateSteps(steps, path, isErrorPath) {

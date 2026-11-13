@@ -21,7 +21,7 @@ import { CapsuleMorph } from './capsule/capsule.js';
 import { HostBridge } from './bridge/host-bridge.js';
 import { MotionIntentBridge } from './ai/intent-bridge.js';
 
-export const VERSION = '1.0.0';
+export const VERSION = '1.1.0';
 
 /**
  * Cria uma instância completa do motor.
@@ -44,21 +44,24 @@ export function createUltraMotionX(options = {}) {
     intent = true,
     effects = true,
     schedulerOptions = {},
+    monitor = true,
   } = options;
 
   const events = new Emitter();
   const scheduler = new MotionScheduler(schedulerOptions);
-  const budget = new MotionBudget({ scheduler, storage, profile, key: options.profileKey ?? 'umx.profile' });
+  const budget = new MotionBudget({ scheduler, storage, profile, monitor, key: options.profileKey ?? 'umx.profile' });
   const animator = new Animator({ scheduler, budget });
   const director = new MotionDirector({ animator, budget });
   const theme = new ThemeMotionBridge({
     root: root?.documentElement ?? null, scheduler, budget, accent, mode, surface,
   });
   const transitions = new TransitionCoordinator({ animator, budget, scheduler });
-  const micro = new MicroInteractions({ animator, scheduler, budget });
+  const micro = new MicroInteractions({ animator, scheduler, budget, ...(options.micro ?? {}) });
   const fx = effects && hasDocument ? new EffectsLayer({ scheduler, budget }) : null;
   const host = bridge ? (bridge instanceof HostBridge ? bridge : new HostBridge(typeof bridge === 'object' ? bridge : {})) : null;
-  const predictor = intent ? new IntentPredictor({ scheduler, budget }) : null;
+  const predictor = intent
+    ? new IntentPredictor({ scheduler, budget, ...(options.intentSelector ? { selector: options.intentSelector } : {}) })
+    : null;
 
   const disposers = [];
   let character = null;
@@ -155,7 +158,7 @@ function cssEscape(value) {
 export { MotionScheduler } from './core/scheduler.js';
 export { Emitter } from './core/emitter.js';
 export { FrameStats, SampleStats } from './core/frame-stats.js';
-export { SPRINGS, resolveSpring, springAt, settleTime, sampleSpring } from './physics/spring.js';
+export { SPRINGS, resolveSpring, springCoefficients, springAt, settleTime, sampleSpring } from './physics/spring.js';
 export { VelocityTracker, projectDecay, decayAt, rubberband } from './physics/inertia.js';
 export { Animator, MotionHandle } from './animate/animator.js';
 export { MotionValue } from './animate/motion-value.js';

@@ -1,13 +1,25 @@
 {
   "name": "ultra-motion-x",
-  "version": "1.0.0",
+  "version": "1.1.0",
   "description": "Motor universal de movimento: física de mola analítica, animações no compositor (GPU), renderização adaptativa, interações inteligentes e integração nativa com IA. JavaScript puro, sem dependências.",
   "type": "module",
   "main": "src/index.js",
-  "exports": { ".": "./src/index.js" },
-  "files": ["src", "README.md"],
-  "scripts": {
-    "test": "node --test \"test/**/*.test.js\""
+  "exports": {
+    ".": "./src/index.js"
   },
-  "engines": { "node": ">=18" }
+  "files": [
+    "src",
+    "dist",
+    "README.md"
+  ],
+  "scripts": {
+    "test": "node --test \"test/**/*.test.js\"",
+    "build": "node scripts/build.mjs"
+  },
+  "engines": {
+    "node": ">=18"
+  },
+  "devDependencies": {
+    "esbuild": "0.25.10"
+  }
 }

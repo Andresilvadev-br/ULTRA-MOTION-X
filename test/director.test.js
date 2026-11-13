@@ -128,3 +128,36 @@ test('curinga em "on" e eventos simulados marcados', async () => {
   await flush();
   assert.deepEqual(got, [['notify.info', true]]);
 });
+
+test('run(): coreografia sem registro prévio com as mesmas garantias', async () => {
+  const { d, timers } = make();
+  const log = [];
+  assert.throws(() => d.run({ steps: [{ announce: 'success', run() {} }] }));
+  const run = d.run({ name: 'local', channel: 'ui', steps: [{ run: () => log.push('a') }, { delay: 300 }, { run: () => log.push('b') }] });
+  assert.ok(run);
+  await flush();
+  assert.deepEqual(log, ['a']);
+  timers.advance(299); await flush();
+  assert.deepEqual(log, ['a']);
+  timers.advance(1); await flush();
+  assert.deepEqual(log, ['a', 'b']);
+  // mesma chave/canal: a nova substitui a antiga, que não roda mais passos
+  const seen = [];
+  d.run({ channel: 'k', steps: [{ delay: 100 }, { run: () => seen.push('velha') }] });
+  d.run({ channel: 'k', steps: [{ delay: 100 }, { run: () => seen.push('nova') }] });
+  timers.advance(200); await flush();
+  assert.deepEqual(seen, ['nova']);
+});
+
+test('delay de passo é exato mesmo no perfil Performance; ctx.wait encurta', async () => {
+  const timers = fakeTimers();
+  const budget = { profile: { decor: 0 } };
+  const d = new MotionDirector({ timers, budget });
+  const log = [];
+  d.run({ steps: [{ delay: 400 }, { run: () => log.push('exato') }] });
+  d.run({ channel: 'b', steps: [{ run: (ctx) => ctx.wait(400) }, { run: () => log.push('curto') }] });
+  timers.advance(100); await flush(); await flush();
+  assert.deepEqual(log, ['curto']);
+  timers.advance(300); await flush();
+  assert.deepEqual(log, ['curto', 'exato']);
+});
