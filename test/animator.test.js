@@ -129,3 +129,30 @@ test('MotionValue: set preserva velocidade e resolve false ao ser substituído',
   assert.equal(mv.get(), 0);
   assert.ok(seen.length > 5);
 });
+
+test('compositor: caminho rápido com 2 keyframes + linear() em cache quando parte do repouso', async () => {
+  const { springLinearEasing } = await import('../src/animate/animator.js');
+  const { MotionScheduler } = await import('../src/core/scheduler.js');
+  const { Animator } = await import('../src/animate/animator.js');
+  const { fakeFrameClock, fakeElement } = await import('./helpers.js');
+  const clock = fakeFrameClock();
+  const scheduler = new MotionScheduler({ ...clock, autoVisibility: false });
+  const animator = new Animator({ scheduler });
+  animator.linearEasing = true;
+  const el = fakeElement({ animate: true });
+  animator.animate(el, { x: 0, y: 0 }, { from: { x: 40, y: 20 }, spring: 'page', delay: 30 });
+  const a = el.animations[0];
+  assert.equal(a.keyframes.length, 2);
+  assert.equal(a.keyframes[0].translate, '40px 20px');
+  assert.equal(a.keyframes[1].translate, '0px 0px');
+  assert.match(a.opts.easing, /^linear\(0, .*, 1\)$/);
+  assert.equal(a.opts.delay, 30);
+  assert.equal(a.opts.fill, 'backwards');
+  // mesma mola/duração → mesma string em cache
+  const e1 = springLinearEasing({ w0: 10, zeta: 0.8 }, 500), e2 = springLinearEasing({ w0: 10, zeta: 0.8 }, 500);
+  assert.equal(e1, e2);
+  // com velocidade herdada (interrupção) volta aos keyframes amostrados
+  clock.advance(60);
+  animator.animate(el, { x: 100 }, { spring: 'page' });
+  assert.ok(el.animations[1].keyframes.length > 2);
+});

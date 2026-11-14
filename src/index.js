@@ -25,8 +25,9 @@ import { SurfaceMaterial } from './interactions/surface.js';
 import { LiquidIndicator } from './interactions/indicator.js';
 import { layoutTransition } from './transitions/layout.js';
 import { writeDNA } from './theme/dna.js';
+import { PerformanceGovernor } from './budget/governor.js';
 
-export const VERSION = '1.2.0';
+export const VERSION = '1.3.0';
 
 /**
  * Cria uma instância completa do motor.
@@ -115,6 +116,8 @@ export function createUltraMotionX(options = {}) {
     layout: (root, mutate, opts) => layoutTransition(animator, root, mutate, opts),
     /** Publica o Motion DNA (molas como variáveis CSS). */
     dna: (target = root?.documentElement, dna) => writeDNA(target, dna),
+    /** Gerenciador automático de desempenho (Ultra/Balanced/Performance pelo ritmo real de quadros). */
+    governor: (opts) => new PerformanceGovernor({ scheduler, ...opts }),
 
     /** Personagem (ex.: Chico). renderer padrão: SVG procedural sobre a arte existente. */
     character(element, { states, initial, gestures, eyeOpen, renderer } = {}) {
@@ -200,3 +203,4 @@ export { SurfaceMaterial, surfaceTargets } from './interactions/surface.js';
 export { LiquidIndicator } from './interactions/indicator.js';
 export { layoutTransition } from './transitions/layout.js';
 export { MOTION_DNA, dnaTokens, writeDNA, springEasing } from './theme/dna.js';
+export { PerformanceGovernor, hardwareTier, probeGpu, TIERS } from './budget/governor.js';

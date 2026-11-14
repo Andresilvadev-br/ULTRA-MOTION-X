@@ -1,6 +1,33 @@
 import { channelDef, COMPOSITOR_GROUPS, formatGroup, groupChannels } from './channels.js';
 import { createTrack, sampleTrack, trackEnd } from './track.js';
 import { reportError } from '../core/env.js';
+import { springAt } from '../physics/spring.js';
+
+/** linear() suportado? (Chromium 113+ / WebView2 atual). Sem ele, cai nos keyframes amostrados. */
+const LINEAR_EASING = (() => {
+  try { return typeof CSS !== 'undefined' && CSS.supports('animation-timing-function', 'linear(0, 1)'); } catch { return false; }
+})();
+const EASING_CACHE = new Map();
+
+/**
+ * Curva normalizada (0→1) de uma mola partindo do repouso, como CSS linear(), em cache.
+ * Mesma trajetória que os keyframes amostrados, mas calculada uma vez por (mola, duração).
+ */
+export function springLinearEasing(coef, durationMs, perSecond = 60) {
+  const key = `${coef.w0.toFixed(4)}|${coef.zeta.toFixed(4)}|${Math.round(durationMs)}`;
+  let css = EASING_CACHE.get(key);
+  if (css) return css;
+  const n = Math.max(12, Math.min(72, Math.ceil((durationMs / 1000) * perSecond)));
+  const pts = new Array(n + 1);
+  for (let i = 0; i <= n; i++) {
+    const p = i === n ? 1 : 1 - springAt(1, 0, coef, (i / n) * (durationMs / 1000)).d;
+    pts[i] = Math.round(p * 10000) / 10000;
+  }
+  css = `linear(${pts.join(', ')})`;
+  if (EASING_CACHE.size > 64) EASING_CACHE.delete(EASING_CACHE.keys().next().value);
+  EASING_CACHE.set(key, css);
+  return css;
+}
 
 const CSS_PROP = { translate: 'translate', scale: 'scale', rotate: 'rotate', opacity: 'opacity' };
 
@@ -271,6 +298,42 @@ export class Animator {
       st.groups.delete(group);
       this._finalizeGroup(el, st, group, end + 1);
       return;
+    }
+
+    // Caminho rápido: todos os canais do grupo partem do repouso, com a mesma mola e o mesmo
+    // início → o progresso normalizado é idêntico: 2 keyframes + easing linear() em cache.
+    if (this.linearEasing ?? LINEAR_EASING) {
+      const first = tracks[0][1].data;
+      // o progresso normalizado de uma mola que parte do repouso independe da amplitude:
+      // canais com distâncias diferentes compartilham a curva; vale a maior duração do grupo
+      const same = tracks.every(([, t]) => t.data.v0 === 0 && t.data.start === first.start
+        && t.data.coef.w0 === first.coef.w0 && t.data.coef.zeta === first.coef.zeta);
+      const dur = Math.max(...tracks.map(([, t]) => t.data.duration));
+      if (same && first.start >= now - 1) {
+        const from = {}, to = {};
+        for (const [ch, t] of tracks) { from[ch] = t.data.from; to[ch] = t.data.to; }
+        const at = (vals) => (ch) => (ch in vals ? vals[ch] : st.base[ch] ?? channelDef(ch, st.units).initial);
+        const kf = [{ [prop]: formatGroup(group, at(from)) }, { [prop]: formatGroup(group, at(to)) }];
+        el.style.setProperty(prop, formatGroup(group, this._targetGetter(st)));
+        previous?.anim?.cancel();
+        let anim;
+        try {
+          anim = el.animate(kf, {
+            duration: dur * 1000, delay: Math.max(0, first.start - now), fill: 'backwards',
+            easing: springLinearEasing(first.coef, dur * 1000),
+          });
+        } catch (err) { anim = null; }
+        if (anim) {
+          const record = { driver: 'compositor', anim };
+          st.groups.set(group, record);
+          anim.onfinish = () => {
+            if (st.groups.get(group) !== record) return;
+            st.groups.delete(group);
+            this._finalizeGroup(el, st, group, this.scheduler.now() + 1e6);
+          };
+          return;
+        }
+      }
     }
 
     const fps = this.budget?.profile.bakeFps ?? 90;
